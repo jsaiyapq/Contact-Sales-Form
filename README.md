@@ -1,2 +1,6 @@
 # Contact-Sales-Form
-Embedded form served from IMC (https://go.proquest.com/contact-embedded/) and embedded in the pq.com Contact Sales page.
+Embedded form served from IMC and embedded in the proquest.com [Contact Sales](https://www.proquest.com/contact/contact-sales/) page.
+
+Contact Sales page: https://www.proquest.com/contact/contact-sales/
+
+Embedded form url: https://go.proquest.com/contact-embedded/
