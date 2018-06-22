@@ -46,14 +46,18 @@
 <link rel="stylesheet" type="text/css" href="https://www.proquest.com/includes/bootstrap-select.css" />
 <link rel="stylesheet" type="text/css" href="https://www.proquest.com/includes/print-stylesheet.css" media="print" />
 <style type="text/css">
+.parsley-border { /* must come before .parsley-error */
+  border: 2px solid transparent;
+}
 .parsley-error {
   border: 2px solid #a51f1e;
 }
 .parsley-error:focus {
   border: 2px solid #a51f1e;
 }
-.parsley-error-list {
+.parsley-errors-list {
   color: #a51f1e;
+  margin-bottom: 0; /* added */
 }
 .parsley-required {
   color: #a51f1e;
@@ -64,6 +68,9 @@
 form#pq-contact {
   padding: 15px;
 }
+form#pq-contact a {
+  color: #009edf;
+}
 .pq-lead-text {
   font-size: 16px;
 }
@@ -71,17 +78,17 @@ form#pq-contact {
   color: #333333;
   font-size: 15px !important;
 }
-.tooltip-inner {
-    max-width: 275px;
-    color: #a94442;
-    background-color: #f2dede;
-    border-color: #ebccd1;
-    border-style: solid;
-    border-width: 1px;
+textarea.form-control.parsley-error { /* compensate for height:auto */
+  padding: 5px 12px; /* default: 6px 12px */
 }
-/* ID needed here for specificity */
-#pq-contact .tooltip-arrow {
-    border-top-color: #ebccd1;
+.tooltip-inner {
+  max-width: 275px;
+  color: #a94442;
+  background-color: #f2dede;
+  border: 1px solid #ebccd1;
+}
+form#pq-contact .tooltip-arrow { /* id needed here for specificity */
+  border-top-color: #ebccd1;
 }
 </style>
 
@@ -95,6 +102,8 @@ form#pq-contact {
 <script src="https://stage.www.proquest.com/includes/pq-form-utils.js"></script>
 <script>
 $( document ).ready(function() {
+
+  console.log('Begin Doc Ready.'); ////////////////
 
   var today = new Date();
   var dd = today.getDate();
@@ -114,11 +123,14 @@ $( document ).ready(function() {
   $('[data-toggle="tooltip"]').tooltip();
 
   // lock the email field
-  // only if the hidden field with a recipient's ID is present
+  //  only if the hidden field with a recipient's ID is present
+  //  and there is content in the email field (allows us to enter a new email if something goes wrong)
   if ( $('[name="RECIPIENT_ID_*"]').length && $('#email').val().length ) {
 
     // show the email warning in a dialog
     $('#email-warning').modal('show');
+    // and because Firefox sometimes doesn't make the dialog appear...
+    $('#email-warning').css('display', 'block');
 
     // disable email field
     $('#email').prop('disabled', 'disabled');
@@ -133,30 +145,33 @@ $( document ).ready(function() {
     $('#email').prop('disabled', false);
   });
 
+  // from pq-form-utils.js
   startFormUtils('pq-contact', 'country', 'state_province', 'market', 'submarket', 'email', 'first_name');
+
+  console.log('End Doc Ready.'); ////////////////
 
 });
 </script>
 </head>
 
 <body class="grey">
-  <div class="row sectionBlock">
-    <div class="col-ss-12 col-sm-10 col-md-8 col-lg-6 col-centered">
 
-      <div class="modal fade" id="email-warning" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-body">
-              <p><strong>For security purposes and protection of customer data, we have disabled the ability to edit your email address within this form.</strong></p>
-              <p>To update your email address, please register again by submitting a <a href="#" class="clear-identity-action" data-dismiss="modal" name="new_form" xt="SPNOTRACK">new form</a>.</p>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-primary" data-dismiss="modal">Got it</button>
-            </div>
-          </div>
+  <div class="modal fade" id="email-warning" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-body">
+          <p><strong>For security purposes and protection of customer data, we have disabled the ability to edit your email address within this form.</strong></p>
+          <p>To update your email address, please register again by submitting a <a href="#" class="clear-identity-action" data-dismiss="modal" name="new_form" xt="SPNOTRACK">new form</a>.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">Got it</button>
         </div>
       </div>
+    </div>
+  </div>
 
+  <div class="row sectionBlock">
+    <div class="col-ss-12 col-sm-10 col-md-8 col-lg-6 col-centered">
       <form name="pq-contact" id="pq-contact" class="pq-contact" method="post" role="form" autocomplete="off">
       <!-- Autocomplete set to "off" for compatibility workaround for Firefox. -->
 
@@ -1042,7 +1057,7 @@ $( document ).ready(function() {
 
         <div class="row">
           <div class="form-group col-xs-12">
-            <label class="pq-form-label" for="contact_form_comments">Comments <span class="parsley-required">*</span></label>
+            <label class="pq-form-label parsley-border" for="contact_form_comments">Comments <span class="parsley-required">*</span></label>
             <textarea class="form-control" id="contact_form_comments" name="contact_form_comments" required=""></textarea>
           </div>
         </div>
@@ -1051,7 +1066,7 @@ $( document ).ready(function() {
           <div class="col-xs-12">
             <p class="pq-lead-text">Privacy regulations require that we get your consent to continue to collect, store and use the personal information submitted for account creation or collected while using our services.</p>
             <div class="form-group">
-              <label class="pq-form-label"><span class="parsley-required">*</span>&nbsp;<input type="checkbox" value="Yes" name="Double OptIn" required="" />
+              <label class="pq-form-label parsley-border"><span class="parsley-required">*</span>&nbsp;<input type="checkbox" value="Yes" name="Double OptIn" required="" />
               I consent to the collection and use of my personal information consistent with the 
               <a href="https://www.proquest.com/go/privacy">Privacy Policy</a>. 
               I&nbsp;acknowledge that use of the service is subject to the 
@@ -1073,6 +1088,7 @@ $( document ).ready(function() {
 
       </form>
     </div>
+  </div>
 
 <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -1082,6 +1098,5 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','GTM-PKTQGK');</script>
 <!-- End Google Tag Manager -->
 
-  </div>
 </body>
 </html>
