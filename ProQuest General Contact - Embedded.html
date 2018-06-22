@@ -7,7 +7,7 @@
 <link rel="stylesheet" type="text/css" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" />
 <style type="text/css">
 /* Sub-Small devices (512px and up)         */
-/* needed for pages embeded in iframes      */
+/* needed for pages embedded in iframes     */
 /* must come before bootstrap.css in header */
 .col-ss-1,  .col-ss-2,  .col-ss-3,
 .col-ss-4,  .col-ss-5,  .col-ss-6,
@@ -71,12 +71,6 @@ form#pq-contact {
   color: #333333;
   font-size: 15px !important;
 }
-#email-warning {
-    display: none;
-}
-a.clear-identity-action {
-  color: #00a0df;
-}
 .tooltip-inner {
     max-width: 275px;
     color: #a94442;
@@ -97,35 +91,51 @@ a.clear-identity-action {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.2.1/jquery.form.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 <script>var formLanguage = "en";</script>
-<script src="https://www.proquest.com/includes/pq-form-utils.js"></script>
-<!--<script src="https://www.proquest.com/includes/pq-clear-contact-form.js"></script>-->
+<!--<script src="https://www.proquest.com/includes/pq-form-utils.js"></script>-->
+<script src="https://stage.www.proquest.com/includes/pq-form-utils.js"></script>
 <script>
-// Enable Bootstrap tooltip for email field
-  $(function () {
-      $('#email-warning').modal('show');
-      $('[data-toggle="tooltip"]').tooltip();
+$( document ).ready(function() {
+
+  var today = new Date();
+  var dd = today.getDate();
+  var mm = today.getMonth()+1; //January is 0!
+  var yyyy = today.getFullYear();
+  if (dd < 10) { dd = '0'+dd };
+  if (mm < 10) { mm = '0'+mm };
+  today = mm+'/'+dd+'/'+yyyy;
+
+  // set hidden field for current date
+  $('#LastTouchLeadSourceDate').val(today);
+
+  // set up Parsley
+  $('#pq-contact').parsley({ excluded: ':hidden', errorMessage: '', requiredMessage: '' });
+
+  // enable Bootstrap tooltip for email field
+  $('[data-toggle="tooltip"]').tooltip();
+
+  // lock the email field
+  // only if the hidden field with a recipient's ID is present
+  if ( $('[name="RECIPIENT_ID_*"]').length && $('#email').val().length ) {
+
+    // show the email warning in a dialog
+    $('#email-warning').modal('show');
+
+    // disable email field
+    $('#email').prop('disabled', 'disabled');
+
+    // do not require validation on disabled fields
+    $('#email').removeProp('required');
+
+  }
+
+  // enable email field before submitting form, otherwise value will not be sent
+  $('#pq-contact').submit(function(e) {
+    $('#email').prop('disabled', false);
   });
 
-  $( document ).ready(function() {
-    var today = new Date();
-    var dd = today.getDate();
-    var mm = today.getMonth()+1; //January is 0!
-    var yyyy = today.getFullYear();
+  startFormUtils('pq-contact', 'country', 'state_province', 'market', 'submarket', 'email', 'first_name');
 
-    if (dd < 10) { dd = '0'+dd };
-    if (mm < 10) { mm = '0'+mm };
-
-    today = mm+'/'+dd+'/'+yyyy;
-    $("#LastTouchLeadSourceDate").val(today);    // Sets hidden field for current date
-
-    $('form').parsley().options.requiredMessage = "";
-    $("#pq-contact").parsley({ excluded: ":hidden" });
-
-    startFormUtils("pq-contact", "country", "state_province", "market", "submarket", "email", "first_name");
-
-    // From pq-clear-contact-form.js - disallow changing the email address if already set
-    initContactForm('pq-contact', 'email');  // modify this to pass form, email IDs
-  });
+});
 </script>
 </head>
 
@@ -138,10 +148,10 @@ a.clear-identity-action {
           <div class="modal-content">
             <div class="modal-body">
               <p><strong>For security purposes and protection of customer data, we have disabled the ability to edit your email address within this form.</strong></p>
-              <p>To update your email address, please register again by submitting a <a href="#" class="clear-identity-action" data-dismiss="modal" name="NewForm" xt="SPNOTRACK">new form</a>.</p>
+              <p>To update your email address, please register again by submitting a <a href="#" class="clear-identity-action" data-dismiss="modal" name="new_form" xt="SPNOTRACK">new form</a>.</p>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-default" data-dismiss="modal">Got it</button>
+              <button type="button" class="btn btn-primary" data-dismiss="modal">Got it</button>
             </div>
           </div>
         </div>
@@ -568,7 +578,7 @@ a.clear-identity-action {
           </div>
           <div class="form-group col-sm-6">
             <label class="pq-form-label" for="state_province">State/Province</label>
-            <select id="state_province" name="state_province" class="form-control" required="">
+            <select id="state_province" name="state_province" class="form-control">
               <option selected=""></option>
               <option value="A CORU&Ntilde;A">A CORU&Ntilde;A</option>
               <option value="AC">Acre</option>
@@ -1043,9 +1053,9 @@ a.clear-identity-action {
             <div class="form-group">
               <label class="pq-form-label"><span class="parsley-required">*</span>&nbsp;<input type="checkbox" value="Yes" name="Double OptIn" required="" />
               I consent to the collection and use of my personal information consistent with the 
-              <a href="https://www.proquest.com/go/privacy" name="httpswwwproquestcomgoprivacy">Privacy Policy</a>. 
+              <a href="https://www.proquest.com/go/privacy">Privacy Policy</a>. 
               I&nbsp;acknowledge that use of the service is subject to the 
-              <a href="https://proquest.com/go/termsandconditions" name="httpsproquestcomgotermsandconditions">Terms & Conditions</a>.</label>
+              <a href="https://proquest.com/go/termsandconditions">Terms & Conditions</a>.</label>
             </div>
           </div>
         </div>
