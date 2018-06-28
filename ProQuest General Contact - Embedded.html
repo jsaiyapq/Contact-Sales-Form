@@ -147,11 +147,11 @@ $( document ).ready(function() {
 
   // from pq-form-utils.js
   startFormUtils('pq-contact', 'country', 'state_province', 'market', 'submarket', 'email', 'first_name');
-console.log('Selected submarket:  '+$('#submarket option:selected').val()); ////////////////
-console.log('Selected submarket all:  '+$('#submarket').val()); ////////////////
-
-console.log('Selected state/prov: '+$('#state_province option:selected').val()); ////////////////
-console.log('Selected state/prov all: '+$('#state_province').val()); ////////////////
+console.log();
+console.log('Selected submarket option:  '+$('#submarket option:selected').val()); ////////////////
+console.log('Selected submarket:  '+$('#submarket').val()); ////////////////
+console.log('Selected state/prov option: '+$('#state_province option:selected').val()); ////////////////
+console.log('Selected state/prov: '+$('#state_province').val()); ////////////////
 
   console.log('End Doc Ready.'); ////////////////
 
@@ -166,7 +166,7 @@ console.log('Selected state/prov all: '+$('#state_province').val()); ///////////
       <div class="modal-content">
         <div class="modal-body">
           <p><strong>For security purposes and protection of customer data, we have disabled the ability to edit your email address within this form.</strong></p>
-          <p>To update your email address, please register again by submitting a <a href="#" class="clear-identity-action" data-dismiss="modal" name="new_form" xt="SPNOTRACK">new form</a>.</p>
+          <p>To update your email address, please submit a <a href="#" class="clear-identity-action" data-dismiss="modal" name="new_form" xt="SPNOTRACK">new form</a>.</p>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-primary" data-dismiss="modal">Got it</button>
@@ -204,7 +204,7 @@ console.log('Selected state/prov all: '+$('#state_province').val()); ///////////
 
         <div class="row">
           <div class="form-group col-sm-6">
-            <label class="pq-form-label" for="company">Organization Type <span class="parsley-required">*</span></label>
+            <label class="pq-form-label" for="market">Organization Type <span class="parsley-required">*</span></label>
             <select id="market" name="market" class="form-control selectpicker" required="">
               <option selected=""></option>
               <option value="Academic">Academic</option>
@@ -332,7 +332,7 @@ console.log('Selected state/prov all: '+$('#state_province').val()); ///////////
             <label class="pq-form-label" for="email">Email <span class="parsley-required">*</span></label>
             <input name="email" id="email" class="form-control" type="text" required=""
             data-toggle="tooltip" data-placement="top"
-            title="For security purposes and protection of customer data, you will not be able to change your email address once you subscribe." />
+            title="For security purposes and protection of customer data, you will not be able to change your email address once the form has been submitted." />
           </div>
           <div class="form-group col-ss-6">
             <label class="pq-form-label" for="phone">Phone</label>
