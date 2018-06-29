@@ -103,7 +103,7 @@ form#pq-contact .tooltip-arrow { /* id needed here for specificity */
 <script>
 $( document ).ready(function() {
 
-  console.log('Begin Doc Ready.'); ////////////////
+  console.log('\nBegin Doc Ready.'); ////////////////
 
   var today = new Date();
   var dd = today.getDate();
@@ -147,11 +147,14 @@ $( document ).ready(function() {
 
   // from pq-form-utils.js
   startFormUtils('pq-contact', 'country', 'state_province', 'market', 'submarket', 'email', 'first_name');
-console.log();
-console.log('Selected submarket option:  '+$('#submarket option:selected').val()); ////////////////
-console.log('Selected submarket:  '+$('#submarket').val()); ////////////////
-console.log('Selected state/prov option: '+$('#state_province option:selected').val()); ////////////////
-console.log('Selected state/prov: '+$('#state_province').val()); ////////////////
+
+  // IE sometimes does not pull the data from some of the fields into JavaScript
+  //  this happens about half the time
+  //  so keep reloading the page until we get good data
+  if ( !$('#submarket').val() || !$('#state_province').val() ) {
+    console.log('-- Browser error, reloading page...');
+    location.reload(true);
+  }
 
   console.log('End Doc Ready.'); ////////////////
 

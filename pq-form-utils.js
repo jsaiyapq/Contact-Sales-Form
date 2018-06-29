@@ -1,14 +1,16 @@
-/* #######################################  PQ Form Utils  #######################################
-	A Doc Ready JQuery function must be added to the JavaScript on the form .html page.
+/* ########################################  PQ Form Utils  ########################################
 
-	$(document).ready(function(e) {
-		startFormUtils([form id],[country element id],[state/province element id],[market element id],[sub-market element id],[email element id],[first name element id]);
-	});
+   A Doc Ready JQuery function must be added to the JavaScript on the form .html page.
 
-	EXAMPLE:
-		startFormUtils('contact', 'country', 'state_province', 'market', 'submarket', 'email', 'firstname');
+   $(document).ready(function(e) {
+     startFormUtils([form id],[country element id],[state/province element id],[market element id],
+      [sub-market element id],[email element id],[first name element id]);
+   });
 
-   ############################################################################################### */
+   EXAMPLE:
+     startFormUtils('contact', 'country', 'state_province', 'market', 'submarket', 'email', 'firstname');
+
+   ################################################################################################# */
 
 
 // Function to initialize utilities
@@ -19,13 +21,17 @@ function startFormUtils(sfuForm, sfuCountry, sfuStateprov, sfuMarket, sfuSubmark
 		initFormIdentityLink(sfuForm, sfuFirstname, sfuEmail, sfuCountry, sfuStateprov);
 
 	checkMarketSubmarket('init', sfuMarket, sfuSubmarket);
-
+console.log('\nSubmarket ---------'); ////////////////
+console.log('  Selected option:  '+$('#'+sfuSubmarket+' option:selected').val()); ////////////////
+console.log('  Dropdown value:   '+$('#'+sfuSubmarket).val()); ////////////////
 	$('#'+sfuMarket).change(function(e) {
 		checkMarketSubmarket('change', sfuMarket, sfuSubmarket);
 	});
 
 	checkCountryState('init', sfuCountry, sfuStateprov);
-
+console.log('\nState/Province ----'); ////////////////
+console.log('  Selected option:  '+$('#'+sfuStateprov+' option:selected').val()); ////////////////
+console.log('  Dropdown value:   '+$('#'+sfuStateprov).val()); ////////////////
 	$('#'+sfuCountry).change(function(e) {
 		checkCountryState('change', sfuCountry, sfuStateprov);
 	});
@@ -75,73 +81,18 @@ console.log('Clearing identity...'); ////////////////////////////////
 }
 
 
-// Function to check the value of the "Country" field and set the "State/Province" field accordingly
-function checkCountryState(mode, sfuCountry, sfuStateprov) {
-
-	// Remember selected country
-	var currentCountry = $('#'+sfuCountry).val();
-console.log('currentCountry: ', currentCountry); ////////////////////////////////
-
-	// Remember selected state/province
-	var currentState = $('#'+sfuStateprov+' option:selected').val();
-console.log('currentState: ', currentState); ////////////////////////////////
-
-	// clear existing options from state/province dropdown
-	$('#'+sfuStateprov).empty();
-
-	// Get country and states from JSON
-	var selectedCountry = countryStateList.filter(function(countryState) { return countryState.country == currentCountry });
-
-	if ( selectedCountry.length ) {
-		if ( selectedCountry[0].states.length ) {  // this country has states or provinces
-
-			$('#'+sfuStateprov).prop('disabled', false);		// enable state/province field
-			$('#'+sfuStateprov).prop('required', 'required');	// require state/province field
-			// clear any existing 'required field' asterisk and add one
-			$('#'+sfuStateprov).parent().find('label > span.parsley-required').remove();
-			$('#'+sfuStateprov).parent().children('label').append('<span class="parsley-required"> *</span>');
-
-			// Build country's state/province dropdown list
-			var blankOption = new Option('', '');
-			$('#'+sfuStateprov).append(blankOption);
-			$(selectedCountry[0].states).each(function(index, element) {
-				var o = new Option(element.name, element.code);
-				$('#'+sfuStateprov).append(o);
-			});
-
-			// if this is initiating the form, re-set the existing value loaded from contact
-			if ( mode == 'init' ) {
-				$('#'+sfuStateprov+' option').prop('selected', false);
-				$('#'+sfuStateprov+' option[value="'+currentState+'"]').prop('selected', 'selected');
-				$('#'+sfuStateprov).val(currentState);
-			}
-
-			return;
-
-		}
-	}
-
-	// This country does not have states or provinces
-	$('#'+sfuStateprov).prop('disabled', 'disabled');				// disable state/province field
-	$('#'+sfuStateprov).removeProp('required');					// do not require validation
-	$('#'+sfuStateprov).parent().find('label > span.parsley-required').remove();	// remove asterisk
-	$('#'+sfuStateprov).parsley().validate({force: true});				// remove any Parsley border
-
-}
-
-
 // Function to check the value of the "Market" field and set the "Submarket" field accordingly
 function checkMarketSubmarket(mode, sfuMarket, sfuSubmarket) {
 
 	// Remember selected market
 	var currentMarket = $('#'+sfuMarket).val();
-console.log('currentMarket: ', currentMarket); ////////////////////////////////
+console.log('Selected Market:     ', currentMarket); ////////////////////////////////
 
 	// Remember selected submarket
 	var currentSubmarket = $('#'+sfuSubmarket+' option:selected').val();
-console.log('currentSubmarket: ', currentSubmarket); ////////////////////////////////
+console.log('Selected Submarket:  ', currentSubmarket); ////////////////////////////////
 
-	// clear existing options from submarket dropdown
+	// Clear existing options from submarket dropdown
 	$('#'+sfuSubmarket).empty();
 
 	// Get market and submarkets from JSON
@@ -150,22 +101,22 @@ console.log('currentSubmarket: ', currentSubmarket); ///////////////////////////
 	if ( selectedMarket.length ) {
 		if ( selectedMarket[0].submarkets.length ) {  // this market has submarkets (should always be true)
 
-			$('#'+sfuSubmarket).prop('disabled', false);		// enable submarket field
-
 			// Build market's submarket dropdown list
-			var blankOption = new Option('', '');
-			$('#'+sfuSubmarket).append(blankOption);
+			var o = new Option('', '');
+			$('#'+sfuSubmarket).append(o);
 			$(selectedMarket[0].submarkets).each(function(index, element) {
-				var o = new Option(element, element);
+				o = new Option(element, element);
 				$('#'+sfuSubmarket).append(o);
 			});
 
-			// if this is initiating the form, re-set the existing value loaded from contact
-			if ( mode == 'init') {
+			// If this is initiating the form, re-set the existing value loaded from contact
+			if ( mode == 'init' ) {
 				$('#'+sfuSubmarket+' option').prop('selected', false);
 				$('#'+sfuSubmarket+' option[value="'+currentSubmarket+'"]').prop('selected', 'selected');
 				$('#'+sfuSubmarket).val(currentSubmarket);
 			}
+
+			$('#'+sfuSubmarket).prop('disabled', false);		// enable submarket field
 
 		}
 		else {  // this market does not have submarkets (should never be true)
@@ -178,8 +129,200 @@ console.log('currentSubmarket: ', currentSubmarket); ///////////////////////////
 }
 
 
+// Function to check the value of the "Country" field and set the "State/Province" field accordingly
+function checkCountryState(mode, sfuCountry, sfuStateprov) {
+
+	// Remember selected country
+	var currentCountry = $('#'+sfuCountry).val();
+console.log('Selected Country:    ', currentCountry); ////////////////////////////////
+
+	// Remember selected state/province
+	var currentState = $('#'+sfuStateprov+' option:selected').val();
+console.log('Selected State:      ', currentState); ////////////////////////////////
+
+	// Clear existing options from state/province dropdown
+	$('#'+sfuStateprov).empty();
+
+	// Get country and states from JSON
+	var selectedCountry = countryStateList.filter(function(countryState) { return countryState.country == currentCountry });
+
+	if ( selectedCountry.length ) {
+		if ( selectedCountry[0].states.length ) {  // this country has states or provinces
+
+			// Build country's state/province dropdown list
+			var o = new Option('', '');
+			$('#'+sfuStateprov).append(o);
+			$(selectedCountry[0].states).each(function(index, element) {
+				o = new Option(element.name, element.code);
+				$('#'+sfuStateprov).append(o);
+			});
+
+			// If this is initiating the form, re-set the existing value loaded from contact
+			if ( mode == 'init' ) {
+				$('#'+sfuStateprov+' option').prop('selected', false);
+				$('#'+sfuStateprov+' option[value="'+currentState+'"]').prop('selected', 'selected');
+				$('#'+sfuStateprov).val(currentState);
+			}
+
+			$('#'+sfuStateprov).prop('disabled', false);		// enable state/province field
+			$('#'+sfuStateprov).prop('required', 'required');	// require state/province field
+			// clear any existing 'required field' asterisk and add one
+			$('#'+sfuStateprov).parent().find('label > span.parsley-required').remove();
+			$('#'+sfuStateprov).parent().children('label').append('<span class="parsley-required"> *</span>');
+
+		}
+		else {  // This country does not have states or provinces
+
+			$('#'+sfuStateprov).prop('disabled', 'disabled');				// disable state/province field
+			$('#'+sfuStateprov).removeProp('required');					// do not require validation
+			$('#'+sfuStateprov).parent().find('label > span.parsley-required').remove();	// remove asterisk
+			$('#'+sfuStateprov).parsley().validate({force: true});				// remove any Parsley border
+
+		}
+	}
+
+}
+
+
 // ###############################################################################################
 // #######################################  DATA SECTION  ########################################
+
+// Define JSON for market/submarket
+var marketSubmarketList = [
+{'market': 'Academic', 'submarkets': [
+	'Associates College',
+	'Bacc Associates College',
+	'Bacc Colleges Liberal Arts',
+	'Baccalaureate Colleges General',
+	'Doct Research Univ Extensive',
+	'Doct Research Univ Intensive',
+	'Further Education',
+	'Hospital or Medical Center',
+	'Legal (In-house)',
+	'Masters Colleges and Univ I',
+	'Masters Colleges and Univ II',
+	'Medical Schools',
+	'Non-PHD Granting',
+	'Other Health Profession School',
+	'Other Specialized Institutions',
+	'PHD Granting',
+	'School of Art & Music & Design',
+	'Schools of Business & Mgmt',
+	'Schools of Engineering & Tech',
+	'Schools of Law',
+	'Teachers College',
+	'Theol & Other Faith Seminaries',
+	'Unclassified'
+]},
+{'market': 'Consortia', 'submarkets': [
+	'Academic',
+	'Government',
+	'Schools',
+	'Mixed Market',
+	'Public Library'
+]},
+{'market': 'Corporate', 'submarkets': [
+	'Administrative Services',
+	'Agriculture & Forestry',
+	'Air Transportation',
+	'Arts, Entertainment & Recreation',
+	'Biomedical',
+	'Biotechnology',
+	'Bookstore',
+	'Chemical Manufacturing',
+	'Construction',
+	'Distributor',
+	'Educational Services',
+	'Financial Services',
+	'Food Processing',
+	'Genealogy',
+	'Health',
+	'Hospital or Medical Center',
+	'Legal (In-house)',
+	'Insurance',
+	'Legal Services/Law Firms',
+	'Management Services',
+	'Manufacturing',
+	'Metal Mining',
+	'Mining',
+	'Motor Vehicle Manufacturing',
+	'Museums, Histl Sites & Similar Inst',
+	'Other Information Services',
+	'Personal & Household Products',
+	'Petroleum Industry',
+	'Pharmaceutical',
+	'Professional Services',
+	'Publishing',
+	'Real Estate',
+	'Religious, Grantmaking, Civic & Similar Orgs',
+	'Research Services',
+	'Retail Trade - Not Bookstore',
+	'Social Assistance',
+	'Space Research & Technology',
+	'Transportation & Warehousing',
+	'Unclassified',
+	'Utilities',
+	'Wholesale Trade'
+]},
+{'market': 'Government', 'submarkets': [
+	'Academic',
+	'Academic - Tribal',
+	'Central/Federal',
+	'Social Health Service',
+	'Hospital or Medical Center',
+	'Legal Services/Law',
+	'Museums, Historical Sites & Similar Inst',
+	'National Library',
+	'Local',
+	'State/Provincial',
+	'Schools',
+	'Embassy/USIS/USIA',
+	'Military',
+	'Unclassified'
+]},
+{'market': 'Individual', 'submarkets': [
+	'Academic - Faculty',
+	'Academic - Student',
+	'Non-Academic'
+]},
+{'market': 'Non-profit Corporation', 'submarkets': [
+	'Arts, Entertainment & Recreation',
+	'Environmental / Natural Science',
+	'Financial Services',
+	'Hospital or Other Health',
+	'Legal Services/Law',
+	'Museums, Historical Sites & Similar Inst',
+	'Publishing',
+	'Religious, Grantmaking, Civic & Similar Orgs',
+	'Research Institution / Think Tank',
+	'Social Service',
+	'Trade Union / Professional Organization',
+	'Unclassified'
+]},
+{'market': 'Public Library', 'submarkets': [
+	'Branch',
+	'Main',
+	'National',
+	'Other',
+	'State',
+	'System'
+]},
+{'market': 'Schools', 'submarkets': [
+	'Combined School - Private',
+	'Combined School - Public',
+	'Elementary School - Private',
+	'Elementary School - Public',
+	'High School - Private',
+	'High School - Public',
+	'Middle School - Private',
+	'Middle School - Public',
+	'School District',
+	'Primary',
+	'Secondary',
+	'International Baccalaureate',
+	'Unclassified'
+]}
+];
 
 // Define JSON for countries and states
 var countryStateList = [
@@ -912,141 +1055,4 @@ var countryStateList = [
 {'country': 'Yemen', 'states': []},
 {'country': 'Zambia', 'states': []},
 {'country': 'Zimbabwe', 'states': []}
-];
-
-// Define JSON for market/submarket
-var marketSubmarketList = [
-{'market': 'Academic', 'submarkets': [
-	'Associates College',
-	'Bacc Associates College',
-	'Bacc Colleges Liberal Arts',
-	'Baccalaureate Colleges General',
-	'Doct Research Univ Extensive',
-	'Doct Research Univ Intensive',
-	'Further Education',
-	'Hospital or Medical Center',
-	'Legal (In-house)',
-	'Masters Colleges and Univ I',
-	'Masters Colleges and Univ II',
-	'Medical Schools',
-	'Non-PHD Granting',
-	'Other Health Profession School',
-	'Other Specialized Institutions',
-	'PHD Granting',
-	'School of Art & Music & Design',
-	'Schools of Business & Mgmt',
-	'Schools of Engineering & Tech',
-	'Schools of Law',
-	'Teachers College',
-	'Theol & Other Faith Seminaries',
-	'Unclassified'
-]},
-{'market': 'Consortia', 'submarkets': [
-	'Academic',
-	'Government',
-	'Schools',
-	'Mixed Market',
-	'Public Library'
-]},
-{'market': 'Corporate', 'submarkets': [
-	'Administrative Services',
-	'Agriculture & Forestry',
-	'Air Transportation',
-	'Arts, Entertainment & Recreation',
-	'Biomedical',
-	'Biotechnology',
-	'Bookstore',
-	'Chemical Manufacturing',
-	'Construction',
-	'Distributor',
-	'Educational Services',
-	'Financial Services',
-	'Food Processing',
-	'Genealogy',
-	'Health',
-	'Hospital or Medical Center',
-	'Legal (In-house)',
-	'Insurance',
-	'Legal Services/Law Firms',
-	'Management Services',
-	'Manufacturing',
-	'Metal Mining',
-	'Mining',
-	'Motor Vehicle Manufacturing',
-	'Museums, Histl Sites & Similar Inst',
-	'Other Information Services',
-	'Personal & Household Products',
-	'Petroleum Industry',
-	'Pharmaceutical',
-	'Professional Services',
-	'Publishing',
-	'Real Estate',
-	'Religious, Grantmaking, Civic & Similar Orgs',
-	'Research Services',
-	'Retail Trade - Not Bookstore',
-	'Social Assistance',
-	'Space Research & Technology',
-	'Transportation & Warehousing',
-	'Unclassified',
-	'Utilities',
-	'Wholesale Trade'
-]},
-{'market': 'Government', 'submarkets': [
-	'Academic',
-	'Academic - Tribal',
-	'Central/Federal',
-	'Social Health Service',
-	'Hospital or Medical Center',
-	'Legal Services/Law',
-	'Museums, Historical Sites & Similar Inst',
-	'National Library',
-	'Local',
-	'State/Provincial',
-	'Schools',
-	'Embassy/USIS/USIA',
-	'Military',
-	'Unclassified'
-]},
-{'market': 'Individual', 'submarkets': [
-	'Academic - Faculty',
-	'Academic - Student',
-	'Non-Academic'
-]},
-{'market': 'Non-profit Corporation', 'submarkets': [
-	'Arts, Entertainment & Recreation',
-	'Environmental / Natural Science',
-	'Financial Services',
-	'Hospital or Other Health',
-	'Legal Services/Law',
-	'Museums, Historical Sites & Similar Inst',
-	'Publishing',
-	'Religious, Grantmaking, Civic & Similar Orgs',
-	'Research Institution / Think Tank',
-	'Social Service',
-	'Trade Union / Professional Organization',
-	'Unclassified'
-]},
-{'market': 'Public Library', 'submarkets': [
-	'Branch',
-	'Main',
-	'National',
-	'Other',
-	'State',
-	'System'
-]},
-{'market': 'Schools', 'submarkets': [
-	'Combined School - Private',
-	'Combined School - Public',
-	'Elementary School - Private',
-	'Elementary School - Public',
-	'High School - Private',
-	'High School - Public',
-	'Middle School - Private',
-	'Middle School - Public',
-	'School District',
-	'Primary',
-	'Secondary',
-	'International Baccalaureate',
-	'Unclassified'
-]}
 ];
