@@ -97,9 +97,9 @@ form#pq-contact .tooltip-arrow { /* id needed here for specificity */
 <script src="https://cdnjs.cloudflare.com/ajax/libs/parsley.js/2.7.2/parsley.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.2.1/jquery.form.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
-<script>var formLanguage = "en";</script>
+<script>var formLanguage = 'en';</script>
 <!--<script src="https://www.proquest.com/includes/pq-form-utils.js"></script>-->
-<script src="https://stage.www.proquest.com/includes/pq-form-utils.js"></script>
+<script src="https://stage.www.proquest.com/includes/pq-form-utils.js"></script>  <!-- //////////////// FOR TESTING //////////////// -->
 <script>
 $( document ).ready(function() {
 
@@ -148,13 +148,8 @@ $( document ).ready(function() {
   // from pq-form-utils.js
   startFormUtils('pq-contact', 'country', 'state_province', 'market', 'submarket', 'email', 'first_name');
 
-  // IE sometimes does not pull the data from some of the fields into JavaScript
-  //  this happens about half the time
-  //  so keep reloading the page until we get good data
-  if ( !$('#submarket').val() || !$('#state_province').val() ) {
-    console.log('-- Browser error, reloading page...');
-    location.reload(true);
-  }
+  // focus on the first name field
+  $('#first_name').focus();
 
   console.log('End Doc Ready.'); ////////////////
 

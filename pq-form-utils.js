@@ -17,26 +17,35 @@
 //  Call this from within a $(document).ready JQuery function on the form page
 function startFormUtils(sfuForm, sfuCountry, sfuStateprov, sfuMarket, sfuSubmarket, sfuEmail, sfuFirstname) {
 
-	if ( $('[name="RECIPIENT_ID_*"]').length )  // there is a cookie for this page
-		initFormIdentityLink(sfuForm, sfuFirstname, sfuEmail, sfuCountry, sfuStateprov);
-
+console.log('');
 	checkMarketSubmarket('init', sfuMarket, sfuSubmarket);
-console.log('\nSubmarket ---------'); ////////////////
+console.log('Submarket ---------'); ////////////////
 console.log('  Selected option:  '+$('#'+sfuSubmarket+' option:selected').val()); ////////////////
-console.log('  Dropdown value:   '+$('#'+sfuSubmarket).val()); ////////////////
+console.log('  Dropdown value:   '+$('#'+sfuSubmarket).val()+'\n'); ////////////////
 	$('#'+sfuMarket).change(function(e) {
 		checkMarketSubmarket('change', sfuMarket, sfuSubmarket);
 	});
 
+console.log('');
 	checkCountryState('init', sfuCountry, sfuStateprov);
-console.log('\nState/Province ----'); ////////////////
+console.log('State/Province ----'); ////////////////
 console.log('  Selected option:  '+$('#'+sfuStateprov+' option:selected').val()); ////////////////
-console.log('  Dropdown value:   '+$('#'+sfuStateprov).val()); ////////////////
+console.log('  Dropdown value:   '+$('#'+sfuStateprov).val()+'\n'); ////////////////
 	$('#'+sfuCountry).change(function(e) {
 		checkCountryState('change', sfuCountry, sfuStateprov);
 	});
 
-	$('#'+sfuFirstname).focus();						// focus on the first name field
+	if ( $('[name="RECIPIENT_ID_*"]').length ) {  // there is a cookie for this page
+		// IE sometimes does not pull the data from some of the fields into JavaScript
+		//  this happens about half the time
+		//  so keep reloading the page until we get good data
+		if ( !$('#'+sfuSubmarket).val() ) {
+			console.error('Browser form error. Reloading page.');
+			location.reload(true);
+		}
+
+		initFormIdentityLink(sfuForm, sfuFirstname, sfuEmail, sfuCountry, sfuStateprov);
+	}
 
 }
 
