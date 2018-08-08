@@ -113,8 +113,9 @@ $( document ).ready(function() {
   if (mm < 10) { mm = '0'+mm };
   today = mm+'/'+dd+'/'+yyyy;
 
-  // set hidden field for current date
+  // set hidden fields for current date
   $('#LastTouchLeadSourceDate').val(today);
+  $('#DoubleOptInDate').val(today);
 
   // set up Parsley
   $('#pq-contact').parsley({ excluded: ':hidden', errorMessage: '', requiredMessage: '' });
@@ -1088,6 +1089,7 @@ $( document ).ready(function() {
         <input type="hidden" name="Lead Status" value="Open-Direct Inquiry" class="row" />
         <input type="hidden" name="Last Touch Lead Source" id="LastTouchLeadSource" value="Web-Direct Inquiry" />
         <input type="hidden" name="Last Touch Lead Source Date" id="LastTouchLeadSourceDate" value="mm/dd/yyyy" />
+        <input type="hidden" name="Double OptIn Date" id="DoubleOptInDate" value="mm/dd/yyyy">
 
       </form>
     </div>
