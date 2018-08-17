@@ -1,6 +1,6 @@
 /* ########################################  PQ Form Utils  ########################################
 
-   A Doc Ready JQuery function must be added to the JavaScript on the form .html page.
+   A $(document).ready() JQuery function must be added to the JavaScript on the form .html page.
 
    $(document).ready(function(e) {
      startFormUtils([form id],[country element id],[state/province element id],[market element id],
@@ -14,7 +14,7 @@
 
 
 // Function to initialize utilities
-//  Call this from within a $(document).ready JQuery function on the form page
+//  Call this from within a $(document).ready() JQuery function on the form page
 function startFormUtils(sfuForm, sfuCountry, sfuStateprov, sfuMarket, sfuSubmarket, sfuEmail, sfuFirstname) {
 
 console.log('');
@@ -40,8 +40,10 @@ console.log('  Dropdown value:   '+$('#'+sfuStateprov).val()+'\n'); ////////////
 		//  this happens about half the time
 		//  so keep reloading the page until we get good data
 		if ( !$('#'+sfuSubmarket).val() ) {
-			console.error('Browser form error. Reloading page.');
-			location.reload(true);
+			console.error('Browser form error. '+sfuSubmarket+' field is empty.');
+// Fix disabled due to conflicts with other form pages (creating records with missing fields)
+//			console.error('Browser form error. Reloading page.');
+//			location.reload(true);
 		}
 
 		initFormIdentityLink(sfuForm, sfuFirstname, sfuEmail, sfuCountry, sfuStateprov);
@@ -58,7 +60,7 @@ function initFormIdentityLink(sfuForm, sfuFirstname, sfuEmail, sfuCountry, sfuSt
 	resetTag = '<p class="clear-identity">'+resetText+'</p>';
 	$('#'+sfuForm).before(resetTag);
 
-	// Bind clearIdentity function to click event on identity links
+	// Bind clearIdentity() function to all links that clear the form
 	$('.clear-identity-action').click(function(e) {
 		e.preventDefault();						// don't reload the page
 		clearIdentity(sfuForm, sfuEmail);				// clear the form
@@ -73,8 +75,8 @@ function initFormIdentityLink(sfuForm, sfuFirstname, sfuEmail, sfuCountry, sfuSt
 function clearIdentity(sfuForm, sfuEmail) {
 
 	// Clear the cookie
-	//var remove_sp_identity = $.removeCookie('SP_IDENTITY');
-	//var remove_sp_identity = $.removeCookie('SP_IDENTITY', { path: '/' });
+//	var remove_sp_identity = $.removeCookie('SP_IDENTITY');
+//	var remove_sp_identity = $.removeCookie('SP_IDENTITY', { path: '/' });
 	var remove_sp_identity = true;
 console.log('Clearing identity...'); ////////////////////////////////
 

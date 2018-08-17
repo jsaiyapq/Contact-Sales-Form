@@ -98,24 +98,15 @@ form#pq-contact .tooltip-arrow { /* id needed here for specificity */
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.2.1/jquery.form.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 <script>var formLanguage = 'en';</script>
-<!--<script src="https://www.proquest.com/includes/pq-form-utils.js"></script>-->
-<script src="https://stage.www.proquest.com/includes/pq-form-utils.js"></script>  <!-- //////////////// FOR TESTING //////////////// -->
+<script src="https://www.proquest.com/includes/pq-form-utils.js"></script>
+<!--<script src="https://stage.www.proquest.com/includes/pq-form-utils.js"></script>-->  <!-- //////////////// FOR TESTING //////////////// -->
 <script>
+/*
+ * Document Ready function
+ */
 $( document ).ready(function() {
 
   console.log('\nBegin Doc Ready.'); ////////////////
-
-  var today = new Date();
-  var dd = today.getDate();
-  var mm = today.getMonth()+1; //January is 0!
-  var yyyy = today.getFullYear();
-  if (dd < 10) { dd = '0'+dd };
-  if (mm < 10) { mm = '0'+mm };
-  today = mm+'/'+dd+'/'+yyyy;
-
-  // set hidden fields for current date
-  $('#LastTouchLeadSourceDate').val(today);
-  $('#DoubleOptInDate').val(today);
 
   // set up Parsley
   $('#pq-contact').parsley({ excluded: ':hidden', errorMessage: '', requiredMessage: '' });
@@ -142,7 +133,7 @@ $( document ).ready(function() {
   }
 
   // enable email field before submitting form, otherwise value will not be sent
-  $('#pq-contact').submit(function(e) {
+  $('#pq-contact').submit(function() {
     $('#email').prop('disabled', false);
   });
 
@@ -151,6 +142,18 @@ $( document ).ready(function() {
 
   // focus on the first name field
   $('#first_name').focus();
+
+  // set hidden fields to current date
+  var today = new Date();
+  var dd = today.getDate();
+  var mm = today.getMonth() + 1;    // January is 0!
+  var yyyy = today.getFullYear();
+  if (dd < 10) { dd = '0'+dd };
+  if (mm < 10) { mm = '0'+mm };
+  today = mm+'/'+dd+'/'+yyyy;
+
+  $('#LastTouchLeadSourceDate').val(today);
+  $('#DoubleOptInDate').val(today);
 
   console.log('End Doc Ready.'); ////////////////
 
