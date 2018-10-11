@@ -1089,7 +1089,9 @@ $( document ).ready(function() {
         </div>
 
         <!-- Hidden Fields -->
-        <input type="hidden" name="Lead Status" value="Open-Direct Inquiry" class="row" />
+        <input type="hidden" name="Lead Status" value="Sales Ready" />
+        <!-- only set "Sales Ready Type" if "Lead Status" is set to "Sales Ready" -->
+        <input type="hidden" name="Sales Ready Type" value="Direct Inquiries" />
         <input type="hidden" name="Last Touch Lead Source" id="LastTouchLeadSource" value="Web-Direct Inquiry" />
         <input type="hidden" name="Last Touch Lead Source Date" id="LastTouchLeadSourceDate" value="mm/dd/yyyy" />
         <input type="hidden" name="Double OptIn Date" id="DoubleOptInDate" value="mm/dd/yyyy">
