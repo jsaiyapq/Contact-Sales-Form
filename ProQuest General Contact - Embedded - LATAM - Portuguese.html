@@ -2,20 +2,13 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <title>Contact Us - ProQuest</title>
-  <link href="https://www.proquest.com/includes/bootstrap.css" rel="stylesheet" />
-  <link href="https://www.proquest.com/includes/font-awesome.min.css" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,400,300,700,600" rel="stylesheet" />
-  <link href="https://www.proquest.com/includes/bootstrap-override-20140224.css" rel="stylesheet" />
-  <link href="https://www.proquest.com/includes/bootstrap-select.css" rel="stylesheet" />
-  <link href="https://www.proquest.com/includes/print-stylesheet.css" rel="stylesheet" type="text/css" media="print" />
-  <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
-  <script src="http://assets.serialssolutions.com/misc/pq_landing_page/scripts/parsley.js"></script>
-  <script src="http://assets.serialssolutions.com/misc/pq_landing_page/scripts/jquery.cookie.js"></script>
-  <script src="http://assets.serialssolutions.com/misc/pq_landing_page/scripts/jquery.form.min.js"></script>
-  <script>
-    var formLanguage = "latam-pt";  // should be "pt-BR"?
-  </script>
-  <script src="http://assets.serialssolutions.com/misc/pq_landing_page/scripts/helper-pq-contact-forms.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="https://www.proquest.com/includes/bootstrap.css" />
+  <link rel="stylesheet" type="text/css" href="https://www.proquest.com/includes/font-awesome.min.css" />
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,400,300,700,600" />
+  <link rel="stylesheet" type="text/css" href="https://www.proquest.com/includes/bootstrap-override-20140226.css" />
+  <link rel="stylesheet" type="text/css" href="https://www.proquest.com/includes/bootstrap-select.css" />
+  <link rel="stylesheet" type="text/css" href="https://www.proquest.com/includes/print-stylesheet.css" media="print" />
   <style type="text/css">
     .parsley-error {
       border: 1px solid red;
@@ -24,9 +17,42 @@
       border-color: red;
     }
   </style>
+
+  <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+  <script src="https://www.proquest.com/includes/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/parsley.js/2.7.2/parsley.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.2.1/jquery.form.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+  <script>
+    var formLanguage = "latam-pt";  // should be "pt-BR"?
+  </script>
+  <script src="https://www.proquest.com/includes/helper-pq-contact-forms.js"></script>
+  <script>
+    /*
+     * Document Ready function
+     */
+    $( document ).ready(function() {
+
+      // focus on the first name field
+      $('#first_name').focus();
+
+      // set hidden fields to current date
+      var today = new Date();
+      var dd = today.getDate();
+      var mm = today.getMonth() + 1;    // January is 0!
+      var yyyy = today.getFullYear();
+      if (dd < 10) { dd = '0'+dd };
+      if (mm < 10) { mm = '0'+mm };
+      today = mm+'/'+dd+'/'+yyyy;
+
+      $('#LastTouchLeadSourceDate').val(today);
+
+    });
+  </script>
 </head>
 
 <body>
+
 <div class="row">
   <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
     <h2>Fale conosco</h2>
@@ -38,14 +64,8 @@
   </div>
 
   <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-    <form id="pq-contact" data-validate="parsley" method="post" class="gen-contact pq-contact" role="form">
-      <!-- The "Last Touch Lead Source" can be updated by changing the value=""-->
-      <input type="hidden" name="Last Touch Lead Source" id="LastTouchLeadSource" value="Web-Direct Inquiry" />
-
-      <!-- The "Lead Status" can be updated by changing the value=""-->
-      <input type="hidden" name="Lead Status" value="Sales Ready" />
-      <!-- Only set "Sales Ready Type" if "Lead Status" is set to "Sales Ready" -->
-      <input type="hidden" name="Sales Ready Type" value="Direct Inquiries" />
+    <form id="pq-contact" class="gen-contact pq-contact" data-validate="parsley" method="post" role="form" autocomplete="off">
+      <!-- Autocomplete set to "off" for compatibility workaround for Firefox. -->
 
       <div class="row">
         <div class="form-group col-md-6 col-lg-6"><label for="first_name">Nome<span class="required">*</span></label>
@@ -918,7 +938,13 @@
         <div class="form-group col-md-3 col-lg-3"><input type="submit" value="ENVIAR" class="btn btn-primary btn-lg" name="submit" /></div>
       </div>
 
+      <!-- Hidden Fields -->
+      <input type="hidden" name="Lead Status" value="Sales Ready" />
+      <!-- only set "Sales Ready Type" if "Lead Status" is set to "Sales Ready" -->
+      <input type="hidden" name="Sales Ready Type" value="Direct Inquiries" />
+      <input type="hidden" name="Last Touch Lead Source" id="LastTouchLeadSource" value="Web-Direct Inquiry" />
       <input type="hidden" name="Last Touch Lead Source Date" id="LastTouchLeadSourceDate" value="mm/dd/yyyy" />
+
     </form>
   </div>
 </div>
@@ -927,7 +953,7 @@
 <script>
 (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&amp;amp;amp;l='+l:'';j.async=true;j.src=
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 '//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','GTM-PKTQGK');
 </script> 
