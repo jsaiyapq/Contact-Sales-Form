@@ -11,10 +11,26 @@
   <link rel="stylesheet" type="text/css" href="https://www.proquest.com/includes/print-stylesheet.css" media="print" />
   <style type="text/css">
     .parsley-error {
-      border: 1px solid red;
+      border: 2px solid #a51f1e;
     }
     .parsley-error:focus {
-      border-color: red;
+      border: 2px solid #a51f1e;
+    }
+    .parsley-errors-list {
+      color: #a51f1e;
+      margin-bottom: 0; /* added */
+    }
+    .parsley-required {
+      color: #a51f1e;
+    }
+    .parsley-type {
+      color: #a51f1e;
+    }
+    form label {
+      font-size: 15px !important;
+    }
+    textarea.parsley-error { /* compensate for fat border */
+      padding: 5px 12px; /* default: 6px 12px */
     }
   </style>
 
@@ -64,26 +80,26 @@
   </div>
 
   <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-    <form id="pq-contact" class="gen-contact pq-contact" data-validate="parsley" method="post" role="form" autocomplete="off">
+    <form id="pq-contact" class="pq-contact" data-validate="parsley" method="post" role="form" autocomplete="off">
       <!-- Autocomplete set to "off" for compatibility workaround for Firefox. -->
 
       <div class="row">
-        <div class="form-group col-md-6 col-lg-6"><label for="first_name">이름<span class="required">*</span></label>
-          <input type="text" name="first_name" id="first_name" class="form-control" data-required="true" /></div>
-        <div class="form-group col-md-6 col-lg-6"><label for="last_name">성<span class="required">*</span></label>
-          <input type="text" name="last_name" id="last_name" class="form-control" data-required="true" /></div>
+        <div class="form-group col-md-6 col-lg-6"><label for="first_name">이름 <span class="parsley-required">*</span></label>
+          <input type="text" name="first_name" id="first_name" class="form-control" required="" /></div>
+        <div class="form-group col-md-6 col-lg-6"><label for="last_name">성 <span class="parsley-required">*</span></label>
+          <input type="text" name="last_name" id="last_name" class="form-control" required="" /></div>
       </div>
 
       <div class="row">
-        <div class="form-group col-md-6 col-lg-6"><label for="company">소속기관<span class="required">*</span></label>
-          <input type="text" name="company" id="company" class="form-control" data-required="true" /></div>
-        <div class="form-group col-md-6 col-lg-6"><label for="job_title">직책<span class="required">*</span></label>
-          <input type="text" name="job_title" id="job_title" class="form-control" data-required="true" /></div>
+        <div class="form-group col-md-6 col-lg-6"><label for="company">소속기관 <span class="parsley-required">*</span></label>
+          <input type="text" name="company" id="company" class="form-control" required="" /></div>
+        <div class="form-group col-md-6 col-lg-6"><label for="job_title">직책 <span class="parsley-required">*</span></label>
+          <input type="text" name="job_title" id="job_title" class="form-control" required="" /></div>
       </div>
 
       <div class="row">
-        <div class="form-group col-md-6 col-lg-6"><label for="company">기관 유형<span class="required">*</span></label>
-          <select id="market" name="market" data-required="true" class="form-control">
+        <div class="form-group col-md-6 col-lg-6"><label for="market">기관 유형 <span class="parsley-required">*</span></label>
+          <select id="market" name="market" required="" class="form-control">
             <option selected=""></option>
             <option value="Academic">Academic</option>
             <option value="Consortia">Consortia</option>
@@ -95,8 +111,8 @@
             <option value="Schools">Schools / K-12</option>
           </select>
         </div>
-        <div class="form-group col-md-6 col-lg-6"><label for="submarket">부서타입<span class="required">*</span></label>
-          <select id="submarket" name="submarket" data-required="true" class="form-control">
+        <div class="form-group col-md-6 col-lg-6"><label for="submarket">부서타입 <span class="parsley-required">*</span></label>
+          <select id="submarket" name="submarket" required="" class="form-control">
             <option selected=""></option>
             <option value="Academic">Academic</option>
             <option value="Academic - Faculty">Academic - Faculty</option>
@@ -205,15 +221,15 @@
       </div>
 
       <div class="row">
-        <div class="form-group col-md-6 col-lg-6"><label for="email">이메일<span class="required">*</span></label>
-          <input type="text" name="email" id="email" class="form-control" data-required="true" /></div>
+        <div class="form-group col-md-6 col-lg-6"><label for="email">이메일 <span class="parsley-required">*</span></label>
+          <input type="text" name="email" id="email" class="form-control" required="" /></div>
         <div class="form-group col-md-6 col-lg-6"><label for="phone">전화번호</label>
           <input type="text" name="phone" id="phone" class="form-control" /></div>
       </div>
 
       <div class="row">
-        <div class="form-group col-md-6 col-lg-6"><label for="country">국가<span class="required">*</span></label>
-          <select id="country" name="country" data-required="true" class="form-control">
+        <div class="form-group col-md-6 col-lg-6"><label for="country">국가 <span class="parsley-required">*</span></label>
+          <select id="country" name="country" required="" class="form-control">
             <option selected=""></option>
             <option value="Afghanistan">Afghanistan</option>
             <option value="Aland Islands">Aland Islands</option>
@@ -467,7 +483,7 @@
           </select>
         </div>
         <div class="form-group col-md-6 col-lg-6"><label for="state_province">시/도</label>
-          <select id="state_province" name="state_province" data-required="true" class="form-control">
+          <select id="state_province" name="state_province" class="form-control">
             <option selected=""></option>
             <option value="A CORU&Ntilde;A">A CORU&Ntilde;A</option>
             <option value="AC">Acre</option>
@@ -930,8 +946,8 @@
       </div>
 
       <div class="row">
-        <div class="form-group col-md-12 col-lg-12"><label for="contact_form_comments">내용<span class="required">*</span></label>
-          <textarea class="form-control" id="contact_form_comments" name="contact_form_comments" data-required="true"></textarea></div>
+        <div class="form-group col-md-12 col-lg-12"><label for="contact_form_comments">내용 <span class="parsley-required">*</span></label>
+          <textarea class="form-control" id="contact_form_comments" name="contact_form_comments" required="" ></textarea></div>
       </div>
 
       <div class="row">
