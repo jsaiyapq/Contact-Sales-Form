@@ -7,7 +7,7 @@
       [sub-market element id],[email element id],[first name element id]);
    });
 
-   EXAMPLE:
+   EXAMPLE - change these values to match your field ids:
      startFormUtils('contact', 'country', 'state_province', 'market', 'submarket', 'email', 'firstname');
 
    ################################################################################################# */
@@ -202,9 +202,9 @@ console.log('Selected State:      ', currentState); ////////////////////////////
 var marketSubmarketList = [
 {'market': 'Academic', 'submarkets': [
 	'Associates College',
+	'Baccalaureate Colleges General',
 	'Bacc Associates College',
 	'Bacc Colleges Liberal Arts',
-	'Baccalaureate Colleges General',
 	'Doct Research Univ Extensive',
 	'Doct Research Univ Intensive',
 	'Further Education',
@@ -228,9 +228,9 @@ var marketSubmarketList = [
 {'market': 'Consortia', 'submarkets': [
 	'Academic',
 	'Government',
-	'Schools',
 	'Mixed Market',
-	'Public Library'
+	'Public Library',
+	'Schools'
 ]},
 {'market': 'Corporate', 'submarkets': [
 	'Administrative Services',
@@ -248,16 +248,16 @@ var marketSubmarketList = [
 	'Food Processing',
 	'Genealogy',
 	'Health',
-	'Hospital or Medical Center',
-	'Legal (In-house)',
+	'Historical Societies',
+	'Hospital or Other Health',
 	'Insurance',
+	'Legal (In-house)',
 	'Legal Services/Law Firms',
 	'Management Services',
 	'Manufacturing',
 	'Metal Mining',
 	'Mining',
 	'Motor Vehicle Manufacturing',
-	'Museums, Histl Sites & Similar Inst',
 	'Other Information Services',
 	'Personal & Household Products',
 	'Petroleum Industry',
@@ -279,16 +279,16 @@ var marketSubmarketList = [
 	'Academic',
 	'Academic - Tribal',
 	'Central/Federal',
-	'Social Health Service',
+	'Embassy/USIS/USIA',
 	'Hospital or Medical Center',
 	'Legal Services/Law',
-	'Museums, Historical Sites & Similar Inst',
-	'National Library',
 	'Local',
-	'State/Provincial',
-	'Schools',
-	'Embassy/USIS/USIA',
 	'Military',
+	'Museums, Histl Sites & Similar Inst',
+	'National Library',
+	'Schools',
+	'Social Health Service',
+	'State/Provincial',
 	'Unclassified'
 ]},
 {'market': 'Individual', 'submarkets': [
@@ -302,7 +302,7 @@ var marketSubmarketList = [
 	'Financial Services',
 	'Hospital or Other Health',
 	'Legal Services/Law',
-	'Museums, Historical Sites & Similar Inst',
+	'Museums, Histl Sites & Similar Inst',
 	'Publishing',
 	'Religious, Grantmaking, Civic & Similar Orgs',
 	'Research Institution / Think Tank',
@@ -325,12 +325,12 @@ var marketSubmarketList = [
 	'Elementary School - Public',
 	'High School - Private',
 	'High School - Public',
+	'International Baccalaureate',
 	'Middle School - Private',
 	'Middle School - Public',
-	'School District',
 	'Primary',
+	'School District',
 	'Secondary',
-	'International Baccalaureate',
 	'Unclassified'
 ]}
 ];
@@ -1049,9 +1049,9 @@ var countryStateList = [
 	{'name': 'West Virginia', 'code': 'WV'},
 	{'name': 'Wisconsin', 'code': 'WI'},
 	{'name': 'Wyoming', 'code': 'WY'},
-	{'name': 'U.S. Armed Forces â€“ Americas', 'code': 'AA'},
-	{'name': 'U.S. Armed Forces â€“ Europe', 'code': 'AE'},
-	{'name': 'U.S. Armed Forces â€“ Pacific', 'code': 'AP'}
+	{'name': 'U.S. Armed Forces - Americas', 'code': 'AA'},
+	{'name': 'U.S. Armed Forces - Europe', 'code': 'AE'},
+	{'name': 'U.S. Armed Forces - Pacific', 'code': 'AP'}
 ]},
 {'country': 'United States Minor Outlying Islands', 'states': []},
 {'country': 'Uruguay', 'states': []},
