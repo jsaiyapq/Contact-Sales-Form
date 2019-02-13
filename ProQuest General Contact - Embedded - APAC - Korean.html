@@ -49,8 +49,10 @@
      */
     $( document ).ready(function() {
 
-      // focus on the first name field
-      $('#first_name').focus();
+      // set values for hidden fields that could have been overwritten by auto-populate on the server
+      $('#LeadStatus').val('Sales Ready');
+      $('#SalesReadyType').val('Direct Inquiries');
+      $('#LastTouchLeadSource').val('Web-Direct Inquiry');
 
       // set hidden fields to current date
       var today = new Date();
@@ -62,6 +64,9 @@
       today = mm+'/'+dd+'/'+yyyy;
 
       $('#LastTouchLeadSourceDate').val(today);
+
+      // focus on the first name field
+      $('#first_name').focus();
 
     });
   </script>
@@ -951,14 +956,15 @@
       </div>
 
       <div class="row">
-        <div class="form-group col-md-3 col-lg-3"><input type="submit" value="CONTACT SALES" class="btn btn-primary btn-lg" name="submit" /></div>
+        <div class="form-group col-md-3 col-lg-3">
+          <input type="submit" name="submit" class="btn btn-primary btn-lg" value="CONTACT SALES" />
+        </div>
       </div>
 
       <!-- Hidden Fields -->
-      <input type="hidden" name="Lead Status" value="Sales Ready" />
-      <!-- only set "Sales Ready Type" if "Lead Status" is set to "Sales Ready" -->
-      <input type="hidden" name="Sales Ready Type" value="Direct Inquiries" />
-      <input type="hidden" name="Last Touch Lead Source" id="LastTouchLeadSource" value="Web-Direct Inquiry" />
+      <input type="hidden" name="Lead Status" id="LeadStatus" value="" />
+      <input type="hidden" name="Sales Ready Type" id="SalesReadyType" value="" />
+      <input type="hidden" name="Last Touch Lead Source" id="LastTouchLeadSource" value="" />
       <input type="hidden" name="Last Touch Lead Source Date" id="LastTouchLeadSourceDate" value="mm/dd/yyyy" />
 
     </form>

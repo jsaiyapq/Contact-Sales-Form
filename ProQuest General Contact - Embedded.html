@@ -140,8 +140,10 @@ $( document ).ready(function() {
   // from pq-form-utils.js
   startFormUtils('pq-contact', 'country', 'state_province', 'market', 'submarket', 'email', 'first_name');
 
-  // focus on the first name field
-  $('#first_name').focus();
+  // set values for hidden fields that could have been overwritten by auto-populate on the server
+  $('#LeadStatus').val('Sales Ready');
+  $('#SalesReadyType').val('Direct Inquiries');
+  $('#LastTouchLeadSource').val('Web-Direct Inquiry');
 
   // set hidden fields to current date
   var today = new Date();
@@ -154,6 +156,12 @@ $( document ).ready(function() {
 
   $('#LastTouchLeadSourceDate').val(today);
   $('#DoubleOptInDate').val(today);
+
+  // focus on the first name field
+  $('#first_name').focus();
+  $('#email-warning').on('hidden.bs.modal', function() {  // when modal is dismissed
+    $('#first_name').focus();
+  })
 
   console.log('End Doc Ready.'); ////////////////
 
@@ -1017,9 +1025,9 @@ $( document ).ready(function() {
               <option value="TRABZON">TRABZON</option>
               <option value="TR">Tripura</option>
               <option value="TUNCELI">TUNCELI</option>
-              <option value="AE">U.S. Armed Forces &ndash;&nbsp;Europe</option>
-              <option value="AP">U.S. Armed Forces &ndash;&nbsp;Pacific</option>
-              <option value="AA">U.S. Armed Forces&nbsp;&ndash;&nbsp;Americas</option>
+              <option value="AE">U.S. Armed Forces - Europe</option>
+              <option value="AP">U.S. Armed Forces - Pacific</option>
+              <option value="AA">U.S. Armed Forces - Americas</option>
               <option value="USAK">USAK</option>
               <option value="UT">Utah</option>
               <option value="UP">Uttar Pradesh</option>
@@ -1089,10 +1097,9 @@ $( document ).ready(function() {
         </div>
 
         <!-- Hidden Fields -->
-        <input type="hidden" name="Lead Status" value="Sales Ready" />
-        <!-- only set "Sales Ready Type" if "Lead Status" is set to "Sales Ready" -->
-        <input type="hidden" name="Sales Ready Type" value="Direct Inquiries" />
-        <input type="hidden" name="Last Touch Lead Source" id="LastTouchLeadSource" value="Web-Direct Inquiry" />
+        <input type="hidden" name="Lead Status" id="LeadStatus" value="" />
+        <input type="hidden" name="Sales Ready Type" id="SalesReadyType" value="" />
+        <input type="hidden" name="Last Touch Lead Source" id="LastTouchLeadSource" value="" />
         <input type="hidden" name="Last Touch Lead Source Date" id="LastTouchLeadSourceDate" value="mm/dd/yyyy" />
         <input type="hidden" name="Double OptIn Date" id="DoubleOptInDate" value="mm/dd/yyyy">
 
