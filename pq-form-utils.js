@@ -17,25 +17,18 @@
 //  Call this from within a $(document).ready() JQuery function on the form page
 function startFormUtils(sfuForm, sfuCountry, sfuStateprov, sfuMarket, sfuSubmarket, sfuEmail, sfuFirstname) {
 
-console.log('');
 	checkMarketSubmarket('init', sfuMarket, sfuSubmarket);
-console.log('Submarket ---------'); ////////////////
-console.log('  Selected option:  '+$('#'+sfuSubmarket+' option:selected').val()); ////////////////
-console.log('  Dropdown value:   '+$('#'+sfuSubmarket).val()+'\n'); ////////////////
 	$('#'+sfuMarket).change(function(e) {
 		checkMarketSubmarket('change', sfuMarket, sfuSubmarket);
 	});
 
-console.log('');
 	checkCountryState('init', sfuCountry, sfuStateprov);
-console.log('State/Province ----'); ////////////////
-console.log('  Selected option:  '+$('#'+sfuStateprov+' option:selected').val()); ////////////////
-console.log('  Dropdown value:   '+$('#'+sfuStateprov).val()+'\n'); ////////////////
 	$('#'+sfuCountry).change(function(e) {
 		checkCountryState('change', sfuCountry, sfuStateprov);
 	});
 
 	if ( $('[name="RECIPIENT_ID_*"]').length ) {  // there is a cookie for this page
+
 		// IE sometimes does not pull the data from some of the fields into JavaScript
 		//  this happens about half the time
 		//  so keep reloading the page until we get good data
@@ -47,6 +40,7 @@ console.log('  Dropdown value:   '+$('#'+sfuStateprov).val()+'\n'); ////////////
 		}
 
 		initFormIdentityLink(sfuForm, sfuFirstname, sfuEmail, sfuCountry, sfuStateprov);
+
 	}
 
 }
@@ -55,10 +49,19 @@ console.log('  Dropdown value:   '+$('#'+sfuStateprov).val()+'\n'); ////////////
 // Function to initialize the identity clearing framework if applicable
 function initFormIdentityLink(sfuForm, sfuFirstname, sfuEmail, sfuCountry, sfuStateprov) {
 
-	// Build reset text
-	resetText = 'Not '+$('#'+sfuFirstname).val()+'? <a href="#" class="clear-identity-action" name="clear_form" xt="SPNOTRACK">Clear the form</a>.';
-	resetTag = '<p class="clear-identity">'+resetText+'</p>';
-	$('#'+sfuForm).before(resetTag);
+	// disable email field
+	$('#'+sfuEmail).prop('disabled', 'disabled');
+
+	// do not require validation on disabled fields
+	$('#'+sfuEmail).removeProp('required');
+
+	// enable email field before submitting form, otherwise value will not be sent
+	$('#'+sfuForm).submit(function() {
+		$('#'+sfuEmail).prop('disabled', false);
+	});
+
+	// Show the "Clear the form" prompt
+	$('#clear-identity-prompt').show();
 
 	// Bind clearIdentity() function to all links that clear the form
 	$('.clear-identity-action').click(function(e) {
@@ -83,12 +86,27 @@ console.log('Clearing identity...'); ////////////////////////////////
 	// If cookie removal was successful, finish the job
 	if ( remove_sp_identity ) {
 		$('[name="RECIPIENT_ID_*"]').remove();				// remove the recipient id field
-		$('.clear-identity').html('');					// remove the clear identity link from above the form
+		$('#clear-identity-prompt').hide();				// remove the "Clear the form" prompt from above the form
 		$('#'+sfuForm ).clearForm();					// reset the form (from jquery.form.js)
 		$('#'+sfuEmail).prop('disabled', false);			// enable email field
 		$('#'+sfuEmail).prop('required', 'required');			// require an email address
 	}
 
+}
+
+
+// Function to get today's date for filling out date fields
+function getTodaysDateString() {
+  var today = new Date();
+  var dd = today.getDate();
+  var mm = today.getMonth()+1; //January is 0!
+  var yyyy = today.getFullYear();
+
+  if (dd < 10) { dd = '0'+dd };
+  if (mm < 10) { mm = '0'+mm };
+  today = mm+'/'+dd+'/'+yyyy;
+
+  return today;
 }
 
 
@@ -177,7 +195,7 @@ console.log('Selected State:      ', currentState); ////////////////////////////
 
 			$('#'+sfuStateprov).prop('disabled', false);		// enable state/province field
 			$('#'+sfuStateprov).prop('required', 'required');	// require state/province field
-			// clear any existing 'required field' asterisk and add one
+			// clear any existing "required field" asterisk and add one
 			$('#'+sfuStateprov).parent().find('label > span.parsley-required').remove();
 			$('#'+sfuStateprov).parent().children('label').append('<span class="parsley-required"> *</span>');
 

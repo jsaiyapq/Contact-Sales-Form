@@ -71,6 +71,9 @@ form#pq-contact {
 form#pq-contact a {
   color: #009edf;
 }
+#clear-identity-prompt {
+  display: none;
+}
 .pq-lead-text {
   font-size: 16px;
 }
@@ -119,23 +122,26 @@ $( document ).ready(function() {
   //  and there is content in the email field (allows us to enter a new email if something goes wrong)
   if ( $('[name="RECIPIENT_ID_*"]').length && $('#email').val().length ) {
 
+    // put the user`s first name in the "Clear the form" prompt
+    $('#first_name_span').html($('#first_name').val());
+
+    // disable email field
+    //$('#email').prop('disabled', 'disabled');
+
+    // do not require validation on disabled fields
+    //$('#email').removeProp('required');
+
     // show the email warning in a dialog
     $('#email-warning').modal('show');
     // and because Firefox sometimes doesn't make the dialog appear...
     $('#email-warning').css('display', 'block');
 
-    // disable email field
-    $('#email').prop('disabled', 'disabled');
-
-    // do not require validation on disabled fields
-    $('#email').removeProp('required');
+    // put the focus on the Comments field after dialog is dismissed
+    $('#email-warning').on('hidden.bs.modal', function() {
+      $('#contact_form_comments').focus();
+    })
 
   }
-
-  // enable email field before submitting form, otherwise value will not be sent
-  $('#pq-contact').submit(function() {
-    $('#email').prop('disabled', false);
-  });
 
   // from pq-form-utils.js
   startFormUtils('pq-contact', 'country', 'state_province', 'market', 'submarket', 'email', 'first_name');
@@ -146,22 +152,9 @@ $( document ).ready(function() {
   $('#LastTouchLeadSource').val('Web-Direct Inquiry');
 
   // set hidden fields to current date
-  var today = new Date();
-  var dd = today.getDate();
-  var mm = today.getMonth() + 1;    // January is 0!
-  var yyyy = today.getFullYear();
-  if (dd < 10) { dd = '0'+dd };
-  if (mm < 10) { mm = '0'+mm };
-  today = mm+'/'+dd+'/'+yyyy;
-
-  $('#LastTouchLeadSourceDate').val(today);
-  $('#DoubleOptInDate').val(today);
-
-  // focus on the first name field
-  $('#first_name').focus();
-  $('#email-warning').on('hidden.bs.modal', function() {  // when modal is dismissed
-    $('#first_name').focus();
-  })
+  var dateString = getTodaysDateString();
+  $('#LastTouchLeadSourceDate').val(dateString);
+  $('#DoubleOptInDate').val(dateString);
 
   console.log('End Doc Ready.'); ////////////////
 
@@ -187,6 +180,8 @@ $( document ).ready(function() {
 
   <div class="row sectionBlock">
     <div class="col-ss-12 col-sm-10 col-md-8 col-lg-6 col-centered">
+      <p id="clear-identity-prompt">Not <span id="first_name_span"></span>? <a href="#" class="clear-identity-action" name="clear_form" xt="SPNOTRACK">Clear the form</a>.</p>
+
       <form name="pq-contact" id="pq-contact" class="pq-contact" method="post" role="form" target="_parent" autocomplete="off">
       <!-- Autocomplete set to "off" for compatibility workaround for Firefox. -->
 
