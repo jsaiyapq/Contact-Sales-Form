@@ -182,36 +182,81 @@ $( document ).ready(function() {
     <div class="col-ss-12 col-sm-10 col-md-8 col-lg-6 col-centered">
       <p id="clear-identity-prompt">Not <span id="first_name_span"></span>? <a href="#" class="clear-identity-action" name="clear_form" xt="SPNOTRACK">Clear the form</a>.</p>
 
-      <form name="pq-contact" id="pq-contact" class="pq-contact" method="post" role="form" target="_parent" autocomplete="off">
+      <form name="pq-contact" id="pq-contact" class="pq-contact" method="POST" role="form" target="_parent" autocomplete="off">
       <!-- Autocomplete set to "off" for compatibility workaround for Firefox. -->
 
         <div class="row">
           <div class="form-group col-ss-6">
             <label class="pq-form-label" for="first_name">First Name <span class="parsley-required">*</span></label>
-            <input name="first_name" id="first_name" class="form-control" type="text" value="" required="" />
+            <input name="First Name" id="first_name" class="form-control" type="text" value="" required="" />
           </div>
           <div class="form-group col-ss-6">
             <label class="pq-form-label" for="last_name">Last Name <span class="parsley-required">*</span></label>
-            <input name="last_name" id="last_name" class="form-control" type="text" value="" required="" />
+            <input name="Last Name" id="last_name" class="form-control" type="text" value="" required="" />
           </div>
         </div>
 
         <div class="row">
           <div class="form-group col-sm-6">
             <label class="pq-form-label" for="company">Organization <span class="parsley-required">*</span></label>
-            <input name="company" id="company" class="form-control" type="text" value="" required="" />
+            <input name="Company" id="company" class="form-control" type="text" value="" required="" />
           </div>
           <div class="form-group col-sm-6">
-            <label class="pq-form-label" for="job_title">Job Title <span class="parsley-required">*</span></label>
-            <input name="job_title" id="job_title" class="form-control" type="text" value="" required="" />
+            <label class="pq-form-label" for="job_function">Job Function <span class="parsley-required">*</span></label>
+            <select name="Job Function" id="job_function" class="form-control" required="">
+              <option value="" selected></option>
+              <option value="Academic/Faculty/Teacher/Instructor" >Academic/Faculty/Teacher/Instructor</option>
+              <option value="Academic Dept Chair/Dean/Director (Not Librarian)" >Academic Dept Chair/Dean/Director (Not Librarian)</option>
+              <option value="Accounting/Finance" >Accounting/Finance</option>
+              <option value="Acquisitions/Procurement" >Acquisitions/Procurement</option>
+              <option value="Administration" >Administration</option>
+              <option value="Archivist/Curator" >Archivist/Curator</option>
+              <option value="Author/Content Manager/Editor" >Author/Content Manager/Editor</option>
+              <option value="Automation Librarian" >Automation Librarian</option>
+              <option value="Cataloger/Document Manager" >Cataloger/Document Manager</option>
+              <option value="Collections Development" >Collections Development</option>
+              <option value="Consortia Board Member/Employee" >Consortia Board Member/Employee</option>
+              <option value="Corporate" >Corporate</option>
+              <option value="Curriculum/Education Director" >Curriculum/Education Director</option>
+              <option value="Distributor" >Distributor</option>
+              <option value="Electronic Resources" >Electronic Resources</option>
+              <option value="Engineer" >Engineer</option>
+              <option value="Executive" >Executive</option>
+              <option value="Genealogist" >Genealogist</option>
+              <option value="General Counsel/Patents/Paralegal" >General Counsel/Patents/Paralegal</option>
+              <option value="General Reference Librarian" >General Reference Librarian</option>
+              <option value="Grad Dean /Director/Provost" >Grad Dean /Director/Provost</option>
+              <option value="Grants/Funding" >Grants/Funding</option>
+              <option value="Information Professional" >Information Professional</option>
+              <option value="Information Services Librarian" >Information Services Librarian</option>
+              <option value="Instructional Librarian" >Instructional Librarian</option>
+              <option value="IT/Systems/Network Administrator" >IT/Systems/Network Administrator</option>
+              <option value="K12/School Teacher" >K12/School Teachern</option>
+              <option value="K12 Librarian/Media Specialist/District Librarian" >K12 Librarian/Media Specialist/District Librarian</option>
+              <option value="Librarian (Other)" >Librarian (Other)</option>
+              <option value="Library Director" >Library Director</option>
+              <option value="Library Senior Leader" >Library Senior Leader</option>
+              <option value="Media Librarian" >Media Librarian</option>
+              <option value="Periodicals/Serials Librarian" >Periodicals/Serials Librarian</option>
+              <option value="PQ Employee" >PQ Employee</option>
+              <option value="Principal/Headmaster" >Principal/Headmaster</option>
+              <option value="Public Services Librarian" >Public Services Librarian</option>
+              <option value="Research Support Librarian" >Research Support Librarian</option>
+              <option value="Student/Researcher" >Student/Researcher</option>
+              <option value="Subject Bibliographer/Selector/Liaison" >Subject Bibliographer/Selector/Liaison</option>
+              <option value="Superintendent/Overseer" >Superintendent/Overseer</option>
+              <option value="University Librarian" >University Librarian</option>
+              <option value="Youth/Teen Librarian" >Youth/Teen Librarian</option>
+              <option value="Other" >Other</option>
+            </select>
           </div>
         </div>
 
         <div class="row">
           <div class="form-group col-sm-6">
             <label class="pq-form-label" for="market">Organization Type <span class="parsley-required">*</span></label>
-            <select id="market" name="market" class="form-control selectpicker" required="">
-              <option selected=""></option>
+            <select name="Market" id="market" class="form-control" required="">
+              <option value="" selected></option>
               <option value="Academic">Academic</option>
               <option value="Consortia">Consortia</option>
               <option value="Corporate">Corporate</option>
@@ -224,8 +269,8 @@ $( document ).ready(function() {
           </div>
           <div class="form-group col-sm-6">
             <label class="pq-form-label" for="submarket">Organization Sub Type <span class="parsley-required">*</span></label>
-            <select id="submarket" name="submarket" class="form-control selectpicker" required="">
-              <option selected=""></option>
+            <select name="Sub_Market" id="submarket" class="form-control" required="">
+              <option value="" selected></option>
               <option value="Academic">Academic</option>
               <option value="Academic - Faculty">Academic - Faculty</option>
               <option value="Academic - Student">Academic - Student</option>
@@ -335,21 +380,21 @@ $( document ).ready(function() {
         <div class="row">
           <div class="form-group col-ss-6">
             <label class="pq-form-label" for="email">Email <span class="parsley-required">*</span></label>
-            <input name="email" id="email" class="form-control" type="text" required=""
+            <input name="Email" id="email" class="form-control" type="text" required=""
             data-toggle="tooltip" data-placement="top"
             title="For security purposes and protection of customer data, you will not be able to change your email address once the form has been submitted." />
           </div>
           <div class="form-group col-ss-6">
             <label class="pq-form-label" for="phone">Phone</label>
-            <input name="phone" id="phone" class="form-control" type="text" />
+            <input name="Phone" id="phone" class="form-control" type="text" />
           </div>
         </div>
 
         <div class="row">
           <div class="form-group col-sm-6">
             <label class="pq-form-label" for="country">Country <span class="parsley-required">*</span></label>
-            <select id="country" name="country" class="form-control" required="">
-              <option selected=""></option>
+            <select name="Country" id="country" class="form-control" required="">
+              <option value="" selected></option>
               <option value="Afghanistan">Afghanistan</option>
               <option value="Aland Islands">Aland Islands</option>
               <option value="Albania">Albania</option>
@@ -603,8 +648,8 @@ $( document ).ready(function() {
           </div>
           <div class="form-group col-sm-6">
             <label class="pq-form-label" for="state_province">State/Province</label>
-            <select id="state_province" name="state_province" class="form-control">
-              <option selected=""></option>
+            <select name="State_Province" id="state_province" class="form-control">
+              <option value="" selected></option>
               <option value="A CORU&Ntilde;A">A CORU&Ntilde;A</option>
               <option value="AC">Acre</option>
               <option value="ADANA">ADANA</option>
@@ -1068,7 +1113,7 @@ $( document ).ready(function() {
         <div class="row">
           <div class="form-group col-xs-12">
             <label class="pq-form-label parsley-border" for="contact_form_comments">Comments <span class="parsley-required">*</span></label>
-            <textarea class="form-control" id="contact_form_comments" name="contact_form_comments" required=""></textarea>
+            <textarea name="Contact Form Comments" id="contact_form_comments" class="form-control" required=""></textarea>
           </div>
         </div>
 
@@ -1076,7 +1121,8 @@ $( document ).ready(function() {
           <div class="col-xs-12">
             <p class="pq-lead-text">Privacy regulations require that we get your consent to continue to collect, store and use the personal information submitted for account creation or collected while using our services.</p>
             <div class="form-group">
-              <label class="pq-form-label parsley-border"><span class="parsley-required">*</span>&nbsp;<input type="checkbox" value="Yes" name="Double OptIn" required="" />
+              <label class="pq-form-label parsley-border"><span class="parsley-required">*</span>&nbsp;
+              <input type="checkbox" name="Double OptIn" required="" value="Yes"/>
               I consent to the collection and use of my personal information consistent with the 
               <a href="https://www.proquest.com/go/privacy" target="_blank">Privacy Policy</a>. 
               I&nbsp;acknowledge that use of the service is subject to the 
