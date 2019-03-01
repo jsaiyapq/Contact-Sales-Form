@@ -101,8 +101,8 @@ form#pq-contact .tooltip-arrow { /* id needed here for specificity */
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.2.1/jquery.form.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 <script>var formLanguage = 'en';</script>
-<script src="https://www.proquest.com/includes/pq-form-utils.js"></script>
-<!--<script src="https://stage.www.proquest.com/includes/pq-form-utils.js"></script>-->  <!-- //////////////// FOR TESTING //////////////// -->
+<!--<script src="https://www.proquest.com/includes/pq-form-utils.js"></script>-->
+<script src="https://stage.www.proquest.com/includes/pq-form-utils.js"></script>  <!-- //////////////// FOR TESTING //////////////// -->
 <script>
 /*
  * Document Ready function
@@ -117,6 +117,9 @@ $( document ).ready(function() {
   // enable Bootstrap tooltip for email field
   $('[data-toggle="tooltip"]').tooltip();
 
+  // from pq-form-utils.js
+  startFormUtils('pq-contact', 'first_name', 'email', 'country', 'state_province', 'market', 'submarket', 'job_function', 'job_function_other');
+
   // lock the email field
   //  only if the hidden field with a recipient's ID is present
   //  and there is content in the email field (allows us to enter a new email if something goes wrong)
@@ -125,12 +128,6 @@ $( document ).ready(function() {
     // put the user`s first name in the "Clear the form" prompt
     $('#first_name_span').html($('#first_name').val());
 
-    // disable email field
-    //$('#email').prop('disabled', 'disabled');
-
-    // do not require validation on disabled fields
-    //$('#email').removeProp('required');
-
     // show the email warning in a dialog
     $('#email-warning').modal('show');
     // and because Firefox sometimes doesn't make the dialog appear...
@@ -138,13 +135,11 @@ $( document ).ready(function() {
 
     // put the focus on the Comments field after dialog is dismissed
     $('#email-warning').on('hidden.bs.modal', function() {
+      $('#contact_form_comments').val('');
       $('#contact_form_comments').focus();
     })
 
   }
-
-  // from pq-form-utils.js
-  startFormUtils('pq-contact', 'country', 'state_province', 'market', 'submarket', 'email', 'first_name');
 
   // set values for hidden fields that could have been overwritten by auto-populate on the server
   $('#LeadStatus').val('Sales Ready');
@@ -187,75 +182,82 @@ $( document ).ready(function() {
 
         <div class="row">
           <div class="form-group col-ss-6">
-            <label class="pq-form-label" for="first_name">First Name <span class="parsley-required">*</span></label>
-            <input name="First Name" id="first_name" class="form-control" type="text" value="" required="" />
+            <label class="pq-form-label" for="first_name">First Name<span class="parsley-required"> *</span></label>
+            <input type="text" name="First Name" id="first_name" class="form-control" required />
           </div>
           <div class="form-group col-ss-6">
-            <label class="pq-form-label" for="last_name">Last Name <span class="parsley-required">*</span></label>
-            <input name="Last Name" id="last_name" class="form-control" type="text" value="" required="" />
+            <label class="pq-form-label" for="last_name">Last Name<span class="parsley-required"> *</span></label>
+            <input type="text" name="Last Name" id="last_name" class="form-control" required />
           </div>
         </div>
 
         <div class="row">
           <div class="form-group col-sm-6">
-            <label class="pq-form-label" for="company">Organization <span class="parsley-required">*</span></label>
-            <input name="Company" id="company" class="form-control" type="text" value="" required="" />
+            <label class="pq-form-label" for="company">Organization<span class="parsley-required"> *</span></label>
+            <input type="text" name="Company" id="company" class="form-control" required />
           </div>
           <div class="form-group col-sm-6">
-            <label class="pq-form-label" for="job_function">Job Function <span class="parsley-required">*</span></label>
-            <select name="Job Function" id="job_function" class="form-control" required="">
+            <label class="pq-form-label" for="job_function">Job Function<span class="parsley-required"> *</span></label>
+            <select name="Job Function" id="job_function" class="form-control" required>
               <option value="" selected></option>
-              <option value="Academic/Faculty/Teacher/Instructor" >Academic/Faculty/Teacher/Instructor</option>
-              <option value="Academic Dept Chair/Dean/Director (Not Librarian)" >Academic Dept Chair/Dean/Director (Not Librarian)</option>
-              <option value="Accounting/Finance" >Accounting/Finance</option>
-              <option value="Acquisitions/Procurement" >Acquisitions/Procurement</option>
-              <option value="Administration" >Administration</option>
-              <option value="Archivist/Curator" >Archivist/Curator</option>
-              <option value="Author/Content Manager/Editor" >Author/Content Manager/Editor</option>
-              <option value="Automation Librarian" >Automation Librarian</option>
-              <option value="Cataloger/Document Manager" >Cataloger/Document Manager</option>
-              <option value="Collections Development" >Collections Development</option>
-              <option value="Consortia Board Member/Employee" >Consortia Board Member/Employee</option>
-              <option value="Corporate" >Corporate</option>
-              <option value="Curriculum/Education Director" >Curriculum/Education Director</option>
-              <option value="Distributor" >Distributor</option>
-              <option value="Electronic Resources" >Electronic Resources</option>
-              <option value="Engineer" >Engineer</option>
-              <option value="Executive" >Executive</option>
-              <option value="Genealogist" >Genealogist</option>
-              <option value="General Counsel/Patents/Paralegal" >General Counsel/Patents/Paralegal</option>
-              <option value="General Reference Librarian" >General Reference Librarian</option>
-              <option value="Grad Dean /Director/Provost" >Grad Dean /Director/Provost</option>
-              <option value="Grants/Funding" >Grants/Funding</option>
-              <option value="Information Professional" >Information Professional</option>
-              <option value="Information Services Librarian" >Information Services Librarian</option>
-              <option value="Instructional Librarian" >Instructional Librarian</option>
-              <option value="IT/Systems/Network Administrator" >IT/Systems/Network Administrator</option>
-              <option value="K12/School Teacher" >K12/School Teachern</option>
-              <option value="K12 Librarian/Media Specialist/District Librarian" >K12 Librarian/Media Specialist/District Librarian</option>
-              <option value="Librarian (Other)" >Librarian (Other)</option>
-              <option value="Library Director" >Library Director</option>
-              <option value="Library Senior Leader" >Library Senior Leader</option>
-              <option value="Media Librarian" >Media Librarian</option>
-              <option value="Periodicals/Serials Librarian" >Periodicals/Serials Librarian</option>
-              <option value="PQ Employee" >PQ Employee</option>
-              <option value="Principal/Headmaster" >Principal/Headmaster</option>
-              <option value="Public Services Librarian" >Public Services Librarian</option>
-              <option value="Research Support Librarian" >Research Support Librarian</option>
-              <option value="Student/Researcher" >Student/Researcher</option>
-              <option value="Subject Bibliographer/Selector/Liaison" >Subject Bibliographer/Selector/Liaison</option>
-              <option value="Superintendent/Overseer" >Superintendent/Overseer</option>
-              <option value="University Librarian" >University Librarian</option>
-              <option value="Youth/Teen Librarian" >Youth/Teen Librarian</option>
-              <option value="Other" >Other</option>
+              <option value="Academic/Faculty/Teacher/Instructor">Academic/Faculty/Teacher/Instructor</option>
+              <option value="Academic Dept Chair/Dean/Director (Not Librarian)">Academic Dept Chair/Dean/Director (Not Librarian)</option>
+              <option value="Accounting/Finance">Accounting/Finance</option>
+              <option value="Acquisitions/Procurement">Acquisitions/Procurement</option>
+              <option value="Administration">Administration</option>
+              <option value="Archivist/Curator">Archivist/Curator</option>
+              <option value="Author/Content Manager/Editor">Author/Content Manager/Editor</option>
+              <option value="Automation Librarian">Automation Librarian</option>
+              <option value="Cataloger/Document Manager">Cataloger/Document Manager</option>
+              <option value="Collections Development">Collections Development</option>
+              <option value="Consortia Board Member/Employee">Consortia Board Member/Employee</option>
+              <option value="Corporate">Corporate</option>
+              <option value="Curriculum/Education Director">Curriculum/Education Director</option>
+              <option value="Distributor">Distributor</option>
+              <option value="Electronic Resources">Electronic Resources</option>
+              <option value="Engineer">Engineer</option>
+              <option value="Executive">Executive</option>
+              <option value="Genealogist">Genealogist</option>
+              <option value="General Counsel/Patents/Paralegal">General Counsel/Patents/Paralegal</option>
+              <option value="General Reference Librarian">General Reference Librarian</option>
+              <option value="Grad Dean/Director/Provost">Grad Dean/Director/Provost</option>
+              <option value="Grants/Funding">Grants/Funding</option>
+              <option value="Information Professional">Information Professional</option>
+              <option value="Information Services Librarian">Information Services Librarian</option>
+              <option value="Instructional Librarian">Instructional Librarian</option>
+              <option value="IT/Systems/Network Administrator">IT/Systems/Network Administrator</option>
+              <option value="K12/School Teacher">K12/School Teachern</option>
+              <option value="K12 Librarian/Media Specialist/District Librarian">K12 Librarian/Media Specialist/District Librarian</option>
+              <option value="Librarian (Other)">Librarian (Other)</option>
+              <option value="Library Director">Library Director</option>
+              <option value="Library Senior Leader">Library Senior Leader</option>
+              <option value="Media Librarian">Media Librarian</option>
+              <option value="Periodicals/Serials Librarian">Periodicals/Serials Librarian</option>
+              <option value="PQ Employee">PQ Employee</option>
+              <option value="Principal/Headmaster">Principal/Headmaster</option>
+              <option value="Public Services Librarian">Public Services Librarian</option>
+              <option value="Research Support Librarian">Research Support Librarian</option>
+              <option value="Student/Researcher">Student/Researcher</option>
+              <option value="Subject Bibliographer/Selector/Liaison">Subject Bibliographer/Selector/Liaison</option>
+              <option value="Superintendent/Overseer">Superintendent/Overseer</option>
+              <option value="University Librarian">University Librarian</option>
+              <option value="Youth/Teen Librarian">Youth/Teen Librarian</option>
+              <option value="Other">Other</option>
             </select>
           </div>
         </div>
 
         <div class="row">
+          <div class="form-group col-xs-12">
+            <label class="pq-form-label" for="job_function_other">Other Job Function (specify)</label>
+            <input type="text" name="Job Function Other" id="job_function_other" class="form-control" />
+          </div>
+        </div>
+
+        <div class="row">
           <div class="form-group col-sm-6">
-            <label class="pq-form-label" for="market">Organization Type <span class="parsley-required">*</span></label>
-            <select name="Market" id="market" class="form-control" required="">
+            <label class="pq-form-label" for="market">Organization Type<span class="parsley-required"> *</span></label>
+            <select name="Market" id="market" class="form-control" required>
               <option value="" selected></option>
               <option value="Academic">Academic</option>
               <option value="Consortia">Consortia</option>
@@ -268,8 +270,8 @@ $( document ).ready(function() {
             </select>
           </div>
           <div class="form-group col-sm-6">
-            <label class="pq-form-label" for="submarket">Organization Sub Type <span class="parsley-required">*</span></label>
-            <select name="Sub_Market" id="submarket" class="form-control" required="">
+            <label class="pq-form-label" for="submarket">Organization Sub Type<span class="parsley-required"> *</span></label>
+            <select name="Sub_Market" id="submarket" class="form-control" required>
               <option value="" selected></option>
               <option value="Academic">Academic</option>
               <option value="Academic - Faculty">Academic - Faculty</option>
@@ -379,21 +381,21 @@ $( document ).ready(function() {
 
         <div class="row">
           <div class="form-group col-ss-6">
-            <label class="pq-form-label" for="email">Email <span class="parsley-required">*</span></label>
-            <input name="Email" id="email" class="form-control" type="text" required=""
+            <label class="pq-form-label" for="email">Email<span class="parsley-required"> *</span></label>
+            <input type="text" name="Email" id="email" class="form-control" required
             data-toggle="tooltip" data-placement="top"
             title="For security purposes and protection of customer data, you will not be able to change your email address once the form has been submitted." />
           </div>
           <div class="form-group col-ss-6">
             <label class="pq-form-label" for="phone">Phone</label>
-            <input name="Phone" id="phone" class="form-control" type="text" />
+            <input type="text" name="Phone" id="phone" class="form-control" />
           </div>
         </div>
 
         <div class="row">
           <div class="form-group col-sm-6">
-            <label class="pq-form-label" for="country">Country <span class="parsley-required">*</span></label>
-            <select name="Country" id="country" class="form-control" required="">
+            <label class="pq-form-label" for="country">Country<span class="parsley-required"> *</span></label>
+            <select name="Country" id="country" class="form-control" required>
               <option value="" selected></option>
               <option value="Afghanistan">Afghanistan</option>
               <option value="Aland Islands">Aland Islands</option>
@@ -1112,8 +1114,8 @@ $( document ).ready(function() {
 
         <div class="row">
           <div class="form-group col-xs-12">
-            <label class="pq-form-label parsley-border" for="contact_form_comments">Comments <span class="parsley-required">*</span></label>
-            <textarea name="Contact Form Comments" id="contact_form_comments" class="form-control" required=""></textarea>
+            <label class="pq-form-label parsley-border" for="contact_form_comments">Comments<span class="parsley-required"> *</span></label>
+            <textarea name="Contact Form Comments" id="contact_form_comments" class="form-control" required></textarea>
           </div>
         </div>
 
@@ -1122,7 +1124,7 @@ $( document ).ready(function() {
             <p class="pq-lead-text">Privacy regulations require that we get your consent to continue to collect, store and use the personal information submitted for account creation or collected while using our services.</p>
             <div class="form-group">
               <label class="pq-form-label parsley-border"><span class="parsley-required">*</span>&nbsp;
-              <input type="checkbox" name="Double OptIn" required="" value="Yes"/>
+              <input type="checkbox" name="Double OptIn" required value="Yes"/>
               I consent to the collection and use of my personal information consistent with the 
               <a href="https://www.proquest.com/go/privacy" target="_blank">Privacy Policy</a>. 
               I&nbsp;acknowledge that use of the service is subject to the 
@@ -1133,7 +1135,7 @@ $( document ).ready(function() {
 
         <div class="row">
           <div class="form-group col-md-3 col-lg-3">
-            <input type="submit" value="Submit" name="submit" class="btn btn-primary btn-lg" />
+            <input type="submit" name="submit" class="btn btn-primary btn-lg" value="Submit" />
           </div>
         </div>
 
@@ -1142,7 +1144,7 @@ $( document ).ready(function() {
         <input type="hidden" name="Sales Ready Type" id="SalesReadyType" value="" />
         <input type="hidden" name="Last Touch Lead Source" id="LastTouchLeadSource" value="" />
         <input type="hidden" name="Last Touch Lead Source Date" id="LastTouchLeadSourceDate" value="mm/dd/yyyy" />
-        <input type="hidden" name="Double OptIn Date" id="DoubleOptInDate" value="mm/dd/yyyy">
+        <input type="hidden" name="Double OptIn Date" id="DoubleOptInDate" value="mm/dd/yyyy" />
 
       </form>
     </div>

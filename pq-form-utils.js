@@ -3,19 +3,24 @@
    A $(document).ready() JQuery function must be added to the JavaScript on the form .html page.
 
    $(document).ready(function(e) {
-     startFormUtils([form id],[country element id],[state/province element id],[market element id],
-      [sub-market element id],[email element id],[first name element id]);
+     startFormUtils([form id],[default focus element id],[email element id],[country element id],[state/province element id],
+      [market element id],[sub-market element id],[job function element id],[other job function element id]);
    });
 
    EXAMPLE - change these values to match your field ids:
-     startFormUtils('contact', 'country', 'state_province', 'market', 'submarket', 'email', 'firstname');
+     startFormUtils('pq-contact', 'firstname', 'email', 'country', 'state_province', 'market', 'submarket', 'job_function', 'job_function_other');
 
    ################################################################################################# */
 
 
 // Function to initialize utilities
 //  Call this from within a $(document).ready() JQuery function on the form page
-function startFormUtils(sfuForm, sfuCountry, sfuStateprov, sfuMarket, sfuSubmarket, sfuEmail, sfuFirstname) {
+function startFormUtils(sfuForm, sfuDefaultField, sfuEmail, sfuCountry, sfuStateprov, sfuMarket, sfuSubmarket, sfuJobFunc, sfuOtherJobFunc) {
+
+	checkJobFunction('init', sfuJobFunc, sfuOtherJobFunc);
+	$('#'+sfuJobFunc).change(function(e) {
+		checkJobFunction('change', sfuJobFunc, sfuOtherJobFunc);
+	});
 
 	checkMarketSubmarket('init', sfuMarket, sfuSubmarket);
 	$('#'+sfuMarket).change(function(e) {
@@ -39,7 +44,7 @@ function startFormUtils(sfuForm, sfuCountry, sfuStateprov, sfuMarket, sfuSubmark
 //			location.reload(true);
 		}
 
-		initFormIdentityLink(sfuForm, sfuFirstname, sfuEmail, sfuCountry, sfuStateprov);
+		initFormIdentityLink(sfuForm, sfuDefaultField, sfuEmail, sfuCountry, sfuStateprov, sfuJobFunc, sfuOtherJobFunc);
 
 	}
 
@@ -47,7 +52,7 @@ function startFormUtils(sfuForm, sfuCountry, sfuStateprov, sfuMarket, sfuSubmark
 
 
 // Function to initialize the identity clearing framework if applicable
-function initFormIdentityLink(sfuForm, sfuFirstname, sfuEmail, sfuCountry, sfuStateprov) {
+function initFormIdentityLink(sfuForm, sfuDefaultField, sfuEmail, sfuCountry, sfuStateprov, sfuJobFunc, sfuOtherJobFunc) {
 
 	// disable email field
 	$('#'+sfuEmail).prop('disabled', 'disabled');
@@ -67,8 +72,9 @@ function initFormIdentityLink(sfuForm, sfuFirstname, sfuEmail, sfuCountry, sfuSt
 	$('.clear-identity-action').click(function(e) {
 		e.preventDefault();						// don't reload the page
 		clearIdentity(sfuForm, sfuEmail);				// clear the form
+		checkJobFunction('init', sfuJobFunc, sfuOtherJobFunc);		// reset the Other Job Function field
 		checkCountryState('init', sfuCountry, sfuStateprov);		// reset the State/Province field if needed
-		$('#'+sfuFirstname).focus();					// focus on the first name field
+		$('#'+sfuDefaultField).focus();					// focus on the default field for the form
 	});
 
 }
@@ -110,6 +116,42 @@ function getTodaysDateString() {
 }
 
 
+// Function to check if the value of the "Job Function" field is "Other" and, if so, activate the "Other Job Function" field
+function checkJobFunction(mode, sfuJobFunc, sfuOtherJobFunc) {
+
+	// Remember selected job function
+	var currentJobFunction = $('#'+sfuJobFunc).val();
+console.log('Selected Job Function: ', currentJobFunction); ////////////////////////////////
+
+	if ( currentJobFunction == 'Other' ) {
+
+		$('#'+sfuOtherJobFunc).prop('disabled', false);		// enable other function field
+		$('#'+sfuOtherJobFunc).prop('required', 'required');	// require other function value
+		// clear any existing "required field" asterisk and add one
+		$('#'+sfuOtherJobFunc).parent().find('label > span.parsley-required').remove();
+		$('#'+sfuOtherJobFunc).parent().children('label').append('<span class="parsley-required"> *</span>');
+
+		// If freshly selected, focus on "Other" field
+		if ( mode == 'change' ) {
+			$('#'+sfuOtherJobFunc).focus();
+		}
+
+	}
+	else {  // The job function has been picked from the list
+
+		// Clear "Other" field
+		$('#'+sfuOtherJobFunc).val('');
+
+		$('#'+sfuOtherJobFunc).prop('disabled', 'disabled');				// disable other function field
+		$('#'+sfuOtherJobFunc).removeProp('required');					// do not require validation
+		$('#'+sfuOtherJobFunc).parent().find('label > span.parsley-required').remove();	// remove asterisk
+		$('#'+sfuOtherJobFunc).parsley().validate({force: true});			// remove any Parsley border
+
+	}
+
+}
+
+
 // Function to check the value of the "Market" field and set the "Submarket" field accordingly
 function checkMarketSubmarket(mode, sfuMarket, sfuSubmarket) {
 
@@ -124,35 +166,26 @@ console.log('Selected Submarket:  ', currentSubmarket); ////////////////////////
 	// Clear existing options from submarket dropdown
 	$('#'+sfuSubmarket).empty();
 
-	// Get market and submarkets from JSON
+	// Get the market and its submarkets from data structure
 	var selectedMarket = marketSubmarketList.filter(function(marketSubmarket) { return marketSubmarket.market == currentMarket });
 
-	if ( selectedMarket.length ) {
-		if ( selectedMarket[0].submarkets.length ) {  // this market has submarkets (should always be true)
+	if ( selectedMarket.length ) {  // the market was found
 
-			// Build market's submarket dropdown list
-			var opt = new Option('', '');
+		// Build market's submarket dropdown list
+		var opt = new Option('', '');
+		$('#'+sfuSubmarket).append(opt);
+		$(selectedMarket[0].submarkets).each(function(index, submarket) {
+			opt = new Option(submarket, submarket);
 			$('#'+sfuSubmarket).append(opt);
-			$(selectedMarket[0].submarkets).each(function(index, submarket) {
-				opt = new Option(submarket, submarket);
-				$('#'+sfuSubmarket).append(opt);
-			});
+		});
 
-			// If this is initiating the form, re-set the existing value loaded from contact
-			if ( mode == 'init' ) {
-				$('#'+sfuSubmarket+' option').prop('selected', false);
-				$('#'+sfuSubmarket+' option[value="'+currentSubmarket+'"]').prop('selected', 'selected');
-				$('#'+sfuSubmarket).val(currentSubmarket);
-			}
-
-			$('#'+sfuSubmarket).prop('disabled', false);		// enable submarket field
-
+		// If this is initiating the form, select the existing submarket loaded from contact
+		if ( mode == 'init' ) {
+			$('#'+sfuSubmarket+' option').prop('selected', false);
+			$('#'+sfuSubmarket+' option[value="'+currentSubmarket+'"]').prop('selected', 'selected');
+			$('#'+sfuSubmarket).val(currentSubmarket);
 		}
-		else {  // this market does not have submarkets (should never be true)
 
-			$('#'+sfuSubmarket).prop('disabled', 'disabled');	// disable field (shouldn't be possible for market/submarket)
-
-		}
 	}
 
 }
@@ -172,10 +205,15 @@ console.log('Selected State:      ', currentState); ////////////////////////////
 	// Clear existing options from state/province dropdown
 	$('#'+sfuStateprov).empty();
 
-	// Get country and states from JSON
+	$('#'+sfuStateprov).prop('disabled', 'disabled');				// disable state/province field
+	$('#'+sfuStateprov).removeProp('required');					// do not require validation
+	$('#'+sfuStateprov).parent().find('label > span.parsley-required').remove();	// remove asterisk
+	$('#'+sfuStateprov).parsley().validate({force: true});				// remove any Parsley border
+
+	// Get the country and its states (or provinces) from data structure
 	var selectedCountry = countryStateList.filter(function(countryState) { return countryState.country == currentCountry });
 
-	if ( selectedCountry.length ) {
+	if ( selectedCountry.length ) {  // the country was found
 		if ( selectedCountry[0].states.length ) {  // this country has states or provinces
 
 			// Build country's state/province dropdown list
@@ -186,26 +224,18 @@ console.log('Selected State:      ', currentState); ////////////////////////////
 				$('#'+sfuStateprov).append(opt);
 			});
 
-			// If this is initiating the form, re-set the existing value loaded from contact
+			// If this is initiating the form, select the existing state or province loaded from contact
 			if ( mode == 'init' ) {
 				$('#'+sfuStateprov+' option').prop('selected', false);
 				$('#'+sfuStateprov+' option[value="'+currentState+'"]').prop('selected', 'selected');
 				$('#'+sfuStateprov).val(currentState);
 			}
 
-			$('#'+sfuStateprov).prop('disabled', false);		// enable state/province field
-			$('#'+sfuStateprov).prop('required', 'required');	// require state/province field
+			$('#'+sfuStateprov).prop('disabled', false);			// enable state/province field
+			$('#'+sfuStateprov).prop('required', 'required');		// require state/province value
 			// clear any existing "required field" asterisk and add one
 			$('#'+sfuStateprov).parent().find('label > span.parsley-required').remove();
 			$('#'+sfuStateprov).parent().children('label').append('<span class="parsley-required"> *</span>');
-
-		}
-		else {  // This country does not have states or provinces
-
-			$('#'+sfuStateprov).prop('disabled', 'disabled');				// disable state/province field
-			$('#'+sfuStateprov).removeProp('required');					// do not require validation
-			$('#'+sfuStateprov).parent().find('label > span.parsley-required').remove();	// remove asterisk
-			$('#'+sfuStateprov).parsley().validate({force: true});				// remove any Parsley border
 
 		}
 	}
