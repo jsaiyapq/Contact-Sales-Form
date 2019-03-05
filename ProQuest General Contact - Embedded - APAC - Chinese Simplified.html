@@ -42,12 +42,46 @@
   <script>
     var formLanguage = "zh-hans";
   </script>
-  <script src="https://www.proquest.com/includes/helper-pq-contact-forms.js"></script>
+  <!--<script src="https://www.proquest.com/includes/helper-pq-contact-forms.js"></script>  old - remove -->
+  <!--<script src="https://www.proquest.com/includes/pq-form-utils.js"></script>-->
+  <script src="https://stage.www.proquest.com/includes/pq-form-utils.js"></script>  <!-- //////////////// FOR TESTING //////////////// -->
   <script>
     /*
      * Document Ready function
      */
     $( document ).ready(function() {
+
+      console.log('\nBegin Doc Ready.'); ////////////////
+
+      // set up Parsley
+      $('#pq-contact').parsley({ excluded: ':hidden', errorMessage: '', requiredMessage: '' });
+
+      // enable Bootstrap tooltip for email field
+      $('[data-toggle="tooltip"]').tooltip();
+
+      // from pq-form-utils.js
+      startFormUtils('pq-contact', 'first_name', 'email', 'country', 'state_province', 'market', 'submarket', 'job_function', 'job_function_other');
+
+      // lock the email field
+      //  only if the hidden field with a recipient's ID is present
+      //  and there is content in the email field (allows us to enter a new email if something goes wrong)
+      if ( $('[name="RECIPIENT_ID_*"]').length && $('#email').val().length ) {
+
+        // put the user`s first name in the "Clear the form" prompt
+        $('#first_name_span').html($('#first_name').val());
+
+        // show the email warning in a dialog
+        $('#email-warning').modal('show');
+        // and because Firefox sometimes doesn't make the dialog appear...
+        $('#email-warning').css('display', 'block');
+
+        // put the focus on the Comments field after dialog is dismissed
+        $('#email-warning').on('hidden.bs.modal', function() {
+          $('#contact_form_comments').val('');
+          $('#contact_form_comments').focus();
+        })
+
+      }
 
       // set values for hidden fields that could have been overwritten by auto-populate on the server
       $('#LeadStatus').val('Sales Ready');
@@ -55,18 +89,11 @@
       $('#LastTouchLeadSource').val('Web-Direct Inquiry');
 
       // set hidden fields to current date
-      var today = new Date();
-      var dd = today.getDate();
-      var mm = today.getMonth() + 1;    // January is 0!
-      var yyyy = today.getFullYear();
-      if (dd < 10) { dd = '0'+dd };
-      if (mm < 10) { mm = '0'+mm };
-      today = mm+'/'+dd+'/'+yyyy;
+      var dateString = getTodaysDateString();
+      $('#LastTouchLeadSourceDate').val(dateString);
+      //$('#DoubleOptInDate').val(dateString);
 
-      $('#LastTouchLeadSourceDate').val(today);
-
-      // focus on the first name field
-      $('#first_name').focus();
+      console.log('End Doc Ready.'); ////////////////
 
     });
   </script>
@@ -89,26 +116,83 @@
   </div>
 
   <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-    <form id="pq-contact" class="pq-contact" data-validate="parsley" method="post" role="form" autocomplete="off">
-      <!-- Autocomplete set to "off" for compatibility workaround for Firefox. -->
+    <p id="clear-identity-prompt"><a href="#" class="clear-identity-action" name="clear_form" xt="SPNOTRACK">如不是您本人，请重新填写。</a></p>
+
+    <form name="pq-contact" id="pq-contact" class="pq-contact" method="POST" role="form" autocomplete="off">
+    <!-- Autocomplete set to "off" for compatibility workaround for Firefox. -->
 
       <div class="row">
-        <div class="form-group col-md-6 col-lg-6"><label for="first_name">名字 <span class="parsley-required">*</span></label>
-          <input type="text" required="" class="form-control" id="first_name" name="first_name" /></div>
-        <div class="form-group col-md-6 col-lg-6"><label for="last_name">姓氏 <span class="parsley-required">*</span></label>
-          <input type="text" required="" class="form-control" id="last_name" name="last_name" /></div>
+        <div class="form-group col-md-6 col-lg-6">
+          <label for="first_name">名字<span class="parsley-required"> *</span></label>
+          <input type="text" name="First Name" id="first_name" class="form-control" required />
+        </div>
+        <div class="form-group col-md-6 col-lg-6">
+          <label for="last_name">姓氏<span class="parsley-required"> *</span></label>
+          <input type="text" name="Last Name" id="last_name" class="form-control" required />
+        </div>
       </div>
 
       <div class="row">
-        <div class="form-group col-md-6 col-lg-6"><label for="company">机构 <span class="parsley-required">*</span></label>
-          <input type="text" required="" class="form-control" id="company" name="company" /></div>
-        <div class="form-group col-md-6 col-lg-6"><label for="job_title">职务 <span class="parsley-required">*</span></label>
-          <input type="text" required="" class="form-control" id="job_title" name="job_title" /></div>
+        <div class="form-group col-md-6 col-lg-6">
+          <label for="company">机构<span class="parsley-required"> *</span></label>
+          <input type="text" name="Company" id="company" class="form-control" required />
+        </div>
+        <div class="form-group col-md-6 col-lg-6">
+          <label for="job_function">(Job Function) 职务<span class="parsley-required"> *</span></label>
+          <select name="Job Function" id="job_function" class="form-control" required>
+            <option value="" selected></option>
+            <option value="Academic/Faculty/Teacher/Instructor">Academic/Faculty/Teacher/Instructor</option>
+            <option value="Academic Dept Chair/Dean/Director (Not Librarian)">Academic Dept Chair/Dean/Director (Not Librarian)</option>
+            <option value="Accounting/Finance">Accounting/Finance</option>
+            <option value="Acquisitions/Procurement">Acquisitions/Procurement</option>
+            <option value="Administration">Administration</option>
+            <option value="Archivist/Curator">Archivist/Curator</option>
+            <option value="Author/Content Manager/Editor">Author/Content Manager/Editor</option>
+            <option value="Cataloger/Document Manager">Cataloger/Document Manager</option>
+            <option value="Collections Development">Collections Development</option>
+            <option value="Consortia Board Member/Employee">Consortia Board Member/Employee</option>
+            <option value="Corporate">Corporate</option>
+            <option value="Curriculum/Education Director">Curriculum/Education Director</option>
+            <option value="Distributor">Distributor</option>
+            <option value="Electronic Resources">Electronic Resources</option>
+            <option value="Executive">Executive</option>
+            <option value="Genealogist">Genealogist</option>
+            <option value="General Counsel/Patents/Paralegal">General Counsel/Patents/Paralegal</option>
+            <option value="General Reference Librarian">General Reference Librarian</option>
+            <option value="Grad Dean/Director/Provost">Grad Dean/Director/Provost</option>
+            <option value="Information Professional">Information Professional</option>
+            <option value="Information Services Librarian">Information Services Librarian</option>
+            <option value="IT/Systems/Network Administrator">IT/Systems/Network Administrator</option>
+            <option value="K12/School Teacher">K12/School Teacher</option>
+            <option value="K12 Librarian/Media Specialist/District Librarian">K12 Librarian/Media Specialist/District Librarian</option>
+            <option value="Librarian (Other)">Librarian (Other)</option>
+            <option value="Library Director">Library Director</option>
+            <option value="Media Librarian">Media Librarian</option>
+            <option value="Periodicals/Serials Librarian">Periodicals/Serials Librarian</option>
+            <option value="Principal/Headmaster">Principal/Headmaster</option>
+            <option value="Public Services Librarian">Public Services Librarian</option>
+            <option value="Research Support Librarian">Research Support Librarian</option>
+            <option value="Student">Student</option>
+            <option value="Researcher">Researcher</option>
+            <option value="Superintendent/Overseer">Superintendent/Overseer</option>
+            <option value="University Librarian">University Librarian</option>
+            <option value="Youth/Teen Librarian">Youth/Teen Librarian</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
       </div>
 
       <div class="row">
-        <div class="form-group col-md-6 col-lg-6"><label for="market">机构类型 <span class="parsley-required">*</span></label>
-          <select class="form-control" required="" name="market" id="market">
+        <div class="form-group col-xs-12">
+          <label for="job_function_other">Other Job Function (specify)</label>
+          <input type="text" name="Job Function Other" id="job_function_other" class="form-control" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="form-group col-md-6 col-lg-6">
+          <label for="market">机构类型<span class="parsley-required"> *</span></label>
+          <select name="Market" id="market" class="form-control" required>
             <option selected=""></option>
             <option value="Academic">Academic</option>
             <option value="Consortia">Consortia</option>
@@ -120,8 +204,9 @@
             <option value="Schools">Schools / K-12</option>
           </select>
         </div>
-        <div class="form-group col-md-6 col-lg-6"><label for="submarket">机构部门类型 <span class="parsley-required">*</span></label>
-          <select class="form-control" required="" name="submarket" id="submarket">
+        <div class="form-group col-md-6 col-lg-6">
+          <label for="submarket">机构部门类型<span class="parsley-required"> *</span></label>
+          <select name="Sub_Market" id="submarket" class="form-control" required>
             <option selected=""></option>
             <option value="Academic">Academic</option>
             <option value="Academic - Faculty">Academic - Faculty</option>
@@ -230,15 +315,20 @@
       </div>
 
       <div class="row">
-        <div class="form-group col-md-6 col-lg-6"><label for="email">Email <span class="parsley-required">*</span></label>
-          <input type="text" required="" class="form-control" id="email" name="email" /></div>
-        <div class="form-group col-md-6 col-lg-6"><label for="phone">电话</label>
-          <input type="text" class="form-control" id="phone" name="phone" /></div>
+        <div class="form-group col-md-6 col-lg-6">
+          <label for="email">Email<span class="parsley-required"> *</span></label>
+          <input type="text" name="Email" id="email" class="form-control" required/>
+        </div>
+        <div class="form-group col-md-6 col-lg-6">
+          <label for="phone">电话</label>
+          <input type="text" name="Phone" id="phone" class="form-control" />
+        </div>
       </div>
 
       <div class="row">
-        <div class="form-group col-md-6 col-lg-6"><label for="country">国家或地区 <span class="parsley-required">*</span></label>
-          <select class="form-control" required="" name="country" id="country">
+        <div class="form-group col-md-6 col-lg-6">
+          <label for="country">国家或地区<span class="parsley-required"> *</span></label>
+          <select name="Country" id="country" class="form-control" required>
             <option selected=""></option>
             <option value="Afghanistan">Afghanistan</option>
             <option value="Aland Islands">Aland Islands</option>
@@ -491,8 +581,9 @@
             <option value="Zimbabwe">Zimbabwe</option>
           </select>
         </div>
-        <div class="form-group col-md-6 col-lg-6"><label for="state_province">省</label>
-          <select class="form-control" name="state_province" id="state_province">
+        <div class="form-group col-md-6 col-lg-6">
+          <label for="state_province">省</label>
+          <select name="State_Province" id="state_province" class="form-control">
             <option selected=""></option>
             <option value="A CORU&Ntilde;A">A CORU&Ntilde;A</option>
             <option value="AC">Acre</option>
@@ -955,8 +1046,10 @@
       </div>
 
       <div class="row">
-        <div class="form-group col-md-12 col-lg-12"><label for="contact_form_comments">备注 <span class="parsley-required">*</span></label>
-          <textarea required="" name="contact_form_comments" id="contact_form_comments" class="form-control"></textarea></div>
+        <div class="form-group col-xs-12">
+          <label for="contact_form_comments">备注<span class="parsley-required"> *</span></label>
+          <textarea name="Contact Form Comments" id="contact_form_comments" class="form-control" required></textarea>
+        </div>
       </div>
 
       <div class="row">
