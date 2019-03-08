@@ -39,15 +39,45 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/parsley.js/2.7.2/parsley.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.2.1/jquery.form.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
-  <script>
-    var formLanguage = "latam-es";  // should be "es-419"?
-  </script>
-  <script src="https://www.proquest.com/includes/helper-pq-contact-forms.js"></script>
+  <!--<script src="https://www.proquest.com/includes/pq-form-utils.js"></script>-->
+  <script src="https://stage.www.proquest.com/includes/pq-form-utils.js"></script>  <!-- //////////////// FOR TESTING //////////////// -->
   <script>
     /*
      * Document Ready function
      */
     $( document ).ready(function() {
+
+      console.log('\nBegin Doc Ready.'); ////////////////
+
+      // set up Parsley
+      $('#pq-contact').parsley({ excluded: ':hidden', errorMessage: '', requiredMessage: '' });
+
+      // enable Bootstrap tooltip for email field
+      $('[data-toggle="tooltip"]').tooltip();
+
+      // from pq-form-utils.js
+      startFormUtils('pq-contact', 'first_name', 'email', 'country', 'state_province', 'market', 'submarket', 'job_function', 'job_function_other');
+
+      // lock the email field
+      //  only if the hidden field with a recipient's ID is present
+      //  and there is content in the email field (allows us to enter a new email if something goes wrong)
+      if ( $('[name="RECIPIENT_ID_*"]').length && $('#email').val().length ) {
+
+        // put the user`s first name in the "Clear the form" prompt
+        $('#first_name_span').html($('#first_name').val());
+
+        // show the email warning in a dialog
+        $('#email-warning').modal('show');
+        // and because Firefox sometimes doesn't make the dialog appear...
+        $('#email-warning').css('display', 'block');
+
+        // put the focus on the Comments field after dialog is dismissed
+        $('#email-warning').on('hidden.bs.modal', function() {
+          $('#contact_form_comments').val('');
+          $('#contact_form_comments').focus();
+        })
+
+      }
 
       // set values for hidden fields that could have been overwritten by auto-populate on the server
       $('#LeadStatus').val('Sales Ready');
@@ -55,24 +85,17 @@
       $('#LastTouchLeadSource').val('Web-Direct Inquiry');
 
       // set hidden fields to current date
-      var today = new Date();
-      var dd = today.getDate();
-      var mm = today.getMonth() + 1;    // January is 0!
-      var yyyy = today.getFullYear();
-      if (dd < 10) { dd = '0'+dd };
-      if (mm < 10) { mm = '0'+mm };
-      today = mm+'/'+dd+'/'+yyyy;
+      var dateString = getTodaysDateString();
+      $('#LastTouchLeadSourceDate').val(dateString);
+      //$('#DoubleOptInDate').val(dateString);
 
-      $('#LastTouchLeadSourceDate').val(today);
-
-      // focus on the first name field
-      $('#first_name').focus();
+      console.log('End Doc Ready.'); ////////////////
 
     });
   </script>
 </head>
 
-<body>
+<body style="overflow: hidden;">  <!-- 'overflow: hidden' makes sure there are no scrollbars on the iframe -->
 
 <div class="row">
   <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
@@ -85,26 +108,83 @@
   </div>
 
   <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-    <form id="pq-contact" class="pq-contact" data-validate="parsley" method="post" role="form" autocomplete="off">
-      <!-- Autocomplete set to "off" for compatibility workaround for Firefox. -->
+    <p id="clear-identity-prompt">Si usted no es <span id="first_name_span"></span> <a href="#" class="clear-identity-action" name="clear_form" xt="SPNOTRACK">borre el formulario</a>.</p>
+
+    <form name="pq-contact" id="pq-contact" class="pq-contact" method="POST" role="form" autocomplete="off">
+    <!-- Autocomplete set to "off" for compatibility workaround for Firefox. -->
 
       <div class="row">
-        <div class="form-group col-md-6 col-lg-6"><label for="first_name">Nombre <span class="parsley-required">*</span></label>
-          <input type="text" name="first_name" id="first_name" class="form-control" required="" /></div>
-        <div class="form-group col-md-6 col-lg-6"><label for="last_name">Apellido <span class="parsley-required">*</span></label>
-          <input type="text" name="last_name" id="last_name" class="form-control" required="" /></div>
+        <div class="form-group col-md-6 col-lg-6">
+          <label for="first_name">Nombre<span class="parsley-required"> *</span></label>
+          <input type="text" name="First Name" id="first_name" class="form-control" required />
+        </div>
+        <div class="form-group col-md-6 col-lg-6">
+          <label for="last_name">Apellido<span class="parsley-required"> *</span></label>
+          <input type="text" name="Last Name" id="last_name" class="form-control" required />
+        </div>
       </div>
 
       <div class="row">
-        <div class="form-group col-md-6 col-lg-6"><label for="company">Nombre de la organizaci&oacute;n <span class="parsley-required">*</span></label>
-          <input type="text" name="company" id="company" class="form-control" required="" /></div>
-        <div class="form-group col-md-6 col-lg-6"><label for="job_title">T&iacute;tulo del trabajo <span class="parsley-required">*</span></label>
-          <input type="text" name="job_title" id="job_title" class="form-control" required="" /></div>
+        <div class="form-group col-xs-12">
+          <label for="company">Nombre de la organizaci&oacute;n<span class="parsley-required"> *</span></label>
+          <input type="text" name="Company" id="company" class="form-control" required />
+        </div>
       </div>
 
       <div class="row">
-        <div class="form-group col-md-6 col-lg-6"><label for="market">Tipo de Organizaci&oacute;n <span class="parsley-required">*</span></label>
-          <select id="market" name="market" required="" class="form-control">
+        <div class="form-group col-md-6 col-lg-6">
+          <label for="job_function">(Job Function) T&iacute;tulo del trabajo<span class="parsley-required"> *</span></label>
+          <select name="Job Function" id="job_function" class="form-control" required>
+            <option value="" selected></option>
+            <option value="Academic/Faculty/Teacher/Instructor">Academic/Faculty/Teacher/Instructor</option>
+            <option value="Academic Dept Chair/Dean/Director (Not Librarian)">Academic Dept Chair/Dean/Director (Not Librarian)</option>
+            <option value="Accounting/Finance">Accounting/Finance</option>
+            <option value="Acquisitions/Procurement">Acquisitions/Procurement</option>
+            <option value="Administration">Administration</option>
+            <option value="Archivist/Curator">Archivist/Curator</option>
+            <option value="Author/Content Manager/Editor">Author/Content Manager/Editor</option>
+            <option value="Cataloger/Document Manager">Cataloger/Document Manager</option>
+            <option value="Collections Development">Collections Development</option>
+            <option value="Consortia Board Member/Employee">Consortia Board Member/Employee</option>
+            <option value="Corporate">Corporate</option>
+            <option value="Curriculum/Education Director">Curriculum/Education Director</option>
+            <option value="Distributor">Distributor</option>
+            <option value="Electronic Resources">Electronic Resources</option>
+            <option value="Executive">Executive</option>
+            <option value="Genealogist">Genealogist</option>
+            <option value="General Counsel/Patents/Paralegal">General Counsel/Patents/Paralegal</option>
+            <option value="General Reference Librarian">General Reference Librarian</option>
+            <option value="Grad Dean/Director/Provost">Grad Dean/Director/Provost</option>
+            <option value="Information Professional">Information Professional</option>
+            <option value="Information Services Librarian">Information Services Librarian</option>
+            <option value="IT/Systems/Network Administrator">IT/Systems/Network Administrator</option>
+            <option value="K12/School Teacher">K12/School Teacher</option>
+            <option value="K12 Librarian/Media Specialist/District Librarian">K12 Librarian/Media Specialist/District Librarian</option>
+            <option value="Librarian (Other)">Librarian (Other)</option>
+            <option value="Library Director">Library Director</option>
+            <option value="Media Librarian">Media Librarian</option>
+            <option value="Periodicals/Serials Librarian">Periodicals/Serials Librarian</option>
+            <option value="Principal/Headmaster">Principal/Headmaster</option>
+            <option value="Public Services Librarian">Public Services Librarian</option>
+            <option value="Research Support Librarian">Research Support Librarian</option>
+            <option value="Student">Student</option>
+            <option value="Researcher">Researcher</option>
+            <option value="Superintendent/Overseer">Superintendent/Overseer</option>
+            <option value="University Librarian">University Librarian</option>
+            <option value="Youth/Teen Librarian">Youth/Teen Librarian</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group col-md-6 col-lg-6">
+          <label for="job_function_other">Other Job Function (specify)</label>
+          <input type="text" name="Job Function Other" id="job_function_other" class="form-control" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="form-group col-md-6 col-lg-6">
+          <label for="market">Tipo de Organizaci&oacute;n<span class="parsley-required"> *</span></label>
+          <select name="Market" id="market" class="form-control" required>
             <option selected=""></option>
             <option value="Academic">Academic</option>
             <option value="Consortia">Consortia</option>
@@ -116,125 +196,28 @@
             <option value="Schools">Schools / K-12</option>
           </select>
         </div>
-        <div class="form-group col-md-6 col-lg-6"><label for="submarket">Organizaci&oacute;n Sub Tipo <span class="parsley-required">*</span></label>
-          <select id="submarket" name="submarket" required="" class="form-control">
-            <option selected=""></option>
-            <option value="Academic">Academic</option>
-            <option value="Academic - Faculty">Academic - Faculty</option>
-            <option value="Academic - Student">Academic - Student</option>
-            <option value="Academic - Tribal">Academic - Tribal</option>
-            <option value="Administrative Services">Administrative Services</option>
-            <option value="Agriculture & Forestry">Agriculture &amp; Forestry</option>
-            <option value="Air Transportation">Air Transportation</option>
-            <option value="Arts, Entertainment & Recreation">Arts, Entertainment &amp; Recreation</option>
-            <option value="Associates College">Associates College</option>
-            <option value="Bacc Associates College">Bacc Associates College</option>
-            <option value="Bacc Colleges Liberal Arts">Bacc Colleges Liberal Arts</option>
-            <option value="Baccalaureate Colleges General">Baccalaureate Colleges General</option>
-            <option value="Biomedical">Biomedical</option>
-            <option value="Biotechnology">Biotechnology</option>
-            <option value="Bookstore">Bookstore</option>
-            <option value="Branch">Branch</option>
-            <option value="Central/Federal">Central/Federal</option>
-            <option value="Chemical Manufacturing">Chemical Manufacturing</option>
-            <option value="Combined School - Private">Combined School - Private</option>
-            <option value="Combined School - Public">Combined School - Public</option>
-            <option value="Construction">Construction</option>
-            <option value="Distributor">Distributor</option>
-            <option value="Doct Research Univ Extensive">Doct Research Univ Extensive</option>
-            <option value="Doct Research Univ Intensive">Doct Research Univ Intensive</option>
-            <option value="Educational Services">Educational Services</option>
-            <option value="Elementary School - Private">Elementary School - Private</option>
-            <option value="Elementary School - Public">Elementary School - Public</option>
-            <option value="Embassy/USIS/USIA">Embassy/USIS/USIA</option>
-            <option value="Environmental / Natural Science">Environmental / Natural Science</option>
-            <option value="Financial Services">Financial Services</option>
-            <option value="Food Processing">Food Processing</option>
-            <option value="Further Education">Further Education</option>
-            <option value="Genealogy">Genealogy</option>
-            <option value="Government">Government</option>
-            <option value="Health">Health</option>
-            <option value="High School - Private">High School - Private</option>
-            <option value="High School - Public">High School - Public</option>
-            <option value="Hospital or Medical Center">Hospital or Medical Center</option>
-            <option value="Hospital or Other Health">Hospital or Other Health</option>
-            <option value="Insurance">Insurance</option>
-            <option value="International Baccalaureate">International Baccalaureate</option>
-            <option value="Legal (In-house)">Legal (In-house)</option>
-            <option value="Legal Services/Law">Legal Services/Law</option>
-            <option value="Legal Services/Law Firms">Legal Services/Law Firms</option>
-            <option value="Local">Local</option>
-            <option value="Main">Main</option>
-            <option value="Management Services">Management Services</option>
-            <option value="Manufacturing">Manufacturing</option>
-            <option value="Masters Colleges and Univ I">Masters Colleges and Univ I</option>
-            <option value="Masters Colleges and Univ II">Masters Colleges and Univ II</option>
-            <option value="Medical Schools">Medical Schools</option>
-            <option value="Metal Mining">Metal Mining</option>
-            <option value="Middle School - Private">Middle School - Private</option>
-            <option value="Middle School - Public">Middle School - Public</option>
-            <option value="Military">Military</option>
-            <option value="Mining">Mining</option>
-            <option value="Mixed Market">Mixed Market</option>
-            <option value="Motor Vehicle Manufacturing">Motor Vehicle Manufacturing</option>
-            <option value="Museums, Histl Sites & Similar Inst">Museums, Histl Sites &amp; Similar Inst</option>
-            <option value="Museums, Historical Sites & Similar Inst">Museums, Historical Sites &amp; Similar Inst</option>
-            <option value="National">National</option>
-            <option value="National Library">National Library</option>
-            <option value="Non-Academic">Non-Academic</option>
-            <option value="Non-PHD Granting">Non-PHD Granting</option>
-            <option value="Other">Other</option>
-            <option value="Other Health Profession School">Other Health Profession School</option>
-            <option value="Other Information Services">Other Information Services</option>
-            <option value="Other Specialized Institutions">Other Specialized Institutions</option>
-            <option value="Personal & Household Products">Personal &amp; Household Products</option>
-            <option value="Petroleum Industry">Petroleum Industry</option>
-            <option value="Pharmaceutical">Pharmaceutical</option>
-            <option value="PHD Granting">PHD Granting</option>
-            <option value="Primary">Primary</option>
-            <option value="Professional Services">Professional Services</option>
-            <option value="Public Library">Public Library</option>
-            <option value="Publishing">Publishing</option>
-            <option value="Real Estate">Real Estate</option>
-            <option value="Religious, Grantmaking, Civic & Similar Orgs">Religious, Grantmaking, Civic &amp; Similar Orgs</option>
-            <option value="Research Institution / Think Tank">Research Institution / Think Tank</option>
-            <option value="Research Services">Research Services</option>
-            <option value="Retail Trade - Not Bookstore">Retail Trade - Not Bookstore</option>
-            <option value="School District">School District</option>
-            <option value="School of Art & Music & Design">School of Art &amp; Music &amp; Design</option>
-            <option value="Schools">Schools</option>
-            <option value="Schools of Business & Mgmt">Schools of Business &amp; Mgmt</option>
-            <option value="Schools of Engineering & Tech">Schools of Engineering &amp; Tech</option>
-            <option value="Schools of Law">Schools of Law</option>
-            <option value="Secondary">Secondary</option>
-            <option value="Social Assistance">Social Assistance</option>
-            <option value="Social Health Service">Social Health Service</option>
-            <option value="Social Service">Social Service</option>
-            <option value="Space Research & Technology">Space Research &amp; Technology</option>
-            <option value="State">State</option>
-            <option value="State/Provincial">State/Provincial</option>
-            <option value="System">System</option>
-            <option value="Teachers College">Teachers College</option>
-            <option value="Theol & Other Faith Seminaries">Theol &amp; Other Faith Seminaries</option>
-            <option value="Trade Union / Professional Organization">Trade Union / Professional Organization</option>
-            <option value="Transportation & Warehousing">Transportation &amp; Warehousing</option>
-            <option value="Unclassified">Unclassified</option>
-            <option value="Utilities">Utilities</option>
-            <option value="Wholesale Trade">Wholesale Trade</option>
+        <div class="form-group col-md-6 col-lg-6">
+          <label for="submarket">Organizaci&oacute;n Sub Tipo<span class="parsley-required"> *</span></label>
+          <select name="Sub_Market" id="submarket" class="form-control" required>
           </select>
         </div>
       </div>
 
       <div class="row">
-        <div class="form-group col-md-6 col-lg-6"><label for="email">Email <span class="parsley-required">*</span></label>
-          <input type="text" name="email" id="email" class="form-control" required="" /></div>
-        <div class="form-group col-md-6 col-lg-6"><label for="phone">Tel&eacute;fono</label>
-          <input type="text" name="phone" id="phone" class="form-control" /></div>
+        <div class="form-group col-md-6 col-lg-6">
+          <label for="email">Email<span class="parsley-required"> *</span></label>
+          <input type="text" name="Email" id="email" class="form-control" required />
+        </div>
+        <div class="form-group col-md-6 col-lg-6">
+          <label for="phone">Tel&eacute;fono</label>
+          <input type="text" name="Phone" id="phone" class="form-control" />
+        </div>
       </div>
 
       <div class="row">
-        <div class="form-group col-md-6 col-lg-6"><label for="country">Pa&iacute;s <span class="parsley-required">*</span></label>
-          <select id="country" name="country" required="" class="form-control">
+        <div class="form-group col-md-6 col-lg-6">
+          <label for="country">Pa&iacute;s<span class="parsley-required"> *</span></label>
+          <select name="Country" id="country" class="form-control" required>
             <option selected=""></option>
             <option value="Afghanistan">Afghanistan</option>
             <option value="Aland Islands">Aland Islands</option>
@@ -487,472 +470,18 @@
             <option value="Zimbabwe">Zimbabwe</option>
           </select>
         </div>
-        <div class="form-group col-md-6 col-lg-6"><label for="state_province">Estado / Provincia</label>
-          <select id="state_province" name="state_province" class="form-control">
-            <option selected=""></option>
-            <option value="A CORU&Ntilde;A">A CORU&Ntilde;A</option>
-            <option value="AC">Acre</option>
-            <option value="ADANA">ADANA</option>
-            <option value="ADIYAMAN">ADIYAMAN</option>
-            <option value="AFYONKARAHISAR">AFYONKARAHISAR</option>
-            <option value="AGRI">AGRI</option>
-            <option value="AICHI-KEN">AICHI-KEN</option>
-            <option value="AIN">AIN</option>
-            <option value="AISNE">AISNE</option>
-            <option value="AKITA-KEN">AKITA-KEN</option>
-            <option value="AKSARAY">AKSARAY</option>
-            <option value="AL">Alabama</option>
-            <option value="AL">Alagoas</option>
-            <option value="AK">Alaska</option>
-            <option value="&Aacute;LAVA">&Aacute;LAVA</option>
-            <option value="ALBACETE">ALBACETE</option>
-            <option value="ALICANTE">ALICANTE</option>
-            <option value="ALLIER">ALLIER</option>
-            <option value="ALMER&Iacute;A">ALMER&Iacute;A</option>
-            <option value="ALPES-DE-HAUTE-PROVENCE">ALPES-DE-HAUTE-PROVENCE</option>
-            <option value="ALPES-MARITIMES">ALPES-MARITIMES</option>
-            <option value="AP">Amap&aacute;</option>
-            <option value="AMASYA">AMASYA</option>
-            <option value="AM">Amazonas</option>
-            <option value="AN">Andaman and Nicobar Islands</option>
-            <option value="AP">Andhra Pradesh</option>
-            <option value="AH">Anhui Province</option>
-            <option value="ANKARA">ANKARA</option>
-            <option value="ANTALYA">ANTALYA</option>
-            <option value="AOMORI-KEN">AOMORI-KEN</option>
-            <option value="ARDAHAN">ARDAHAN</option>
-            <option value="ARDECHE">ARDECHE</option>
-            <option value="ARDENNES">ARDENNES</option>
-            <option value="ARIEGE">ARIEGE</option>
-            <option value="AZ">Arizona</option>
-            <option value="AR">Arkansas</option>
-            <option value="ARTVIN">ARTVIN</option>
-            <option value="AR">Arunachal Pradesh</option>
-            <option value="AS">Assam</option>
-            <option value="ASTURIAS">ASTURIAS</option>
-            <option value="AUBE">AUBE</option>
-            <option value="AUDE">AUDE</option>
-            <option value="ACT">Australian Capital Territory</option>
-            <option value="AVEYRON">AVEYRON</option>
-            <option value="&Aacute;VILA">&Aacute;VILA</option>
-            <option value="AYDIN">AYDIN</option>
-            <option value="BADAJOZ">BADAJOZ</option>
-            <option value="BADEN-WURTTEMBERG">BADEN-WURTTEMBERG</option>
-            <option value="BA">Bahia</option>
-            <option value="BALEARIC ISLANDS">BALEARIC ISLANDS</option>
-            <option value="BALIKESIR">BALIKESIR</option>
-            <option value="BARCELONA">BARCELONA</option>
-            <option value="BARTIN">BARTIN</option>
-            <option value="BAS-RHIN">BAS-RHIN</option>
-            <option value="BATMAN">BATMAN</option>
-            <option value="BAVARIA">BAVARIA</option>
-            <option value="BAYBURT">BAYBURT</option>
-            <option value="BJ">Beijing Municipality</option>
-            <option value="BERLIN">BERLIN</option>
-            <option value="BR">Bihar</option>
-            <option value="BILECIK">BILECIK</option>
-            <option value="BINGOL">BINGOL</option>
-            <option value="BISCAY">BISCAY</option>
-            <option value="BITLIS">BITLIS</option>
-            <option value="BOLU">BOLU</option>
-            <option value="BOUCHES-DU-RHONE">BOUCHES-DU-RHONE</option>
-            <option value="BRANDENBURG">BRANDENBURG</option>
-            <option value="BREMEN">BREMEN</option>
-            <option value="BURDUR">BURDUR</option>
-            <option value="BURGOS">BURGOS</option>
-            <option value="BURSA">BURSA</option>
-            <option value="C&Aacute;CERES">C&Aacute;CERES</option>
-            <option value="CADIZ">CADIZ</option>
-            <option value="CA">California</option>
-            <option value="CALVADOS">CALVADOS</option>
-            <option value="CANAKKALE">CANAKKALE</option>
-            <option value="CANKIRI">CANKIRI</option>
-            <option value="CANTABRIA">CANTABRIA</option>
-            <option value="CANTAL">CANTAL</option>
-            <option value="CASTELLON">CASTELLON</option>
-            <option value="CE">Cear&aacute;</option>
-            <option value="CEUTA">CEUTA</option>
-            <option value="CH">Chandigarh</option>
-            <option value="CHARENTE">CHARENTE</option>
-            <option value="CHARENTE-MARITIME">CHARENTE-MARITIME</option>
-            <option value="CHER">CHER</option>
-            <option value="CT">Chhattisgarh</option>
-            <option value="CHIBA-KEN">CHIBA-KEN</option>
-            <option value="CQ">Chongqing Municipality</option>
-            <option value="CIUDAD REAL">CIUDAD REAL</option>
-            <option value="CO">Colorado</option>
-            <option value="CT">Connecticut</option>
-            <option value="C&Oacute;RDOBA">C&Oacute;RDOBA</option>
-            <option value="CORREZE">CORREZE</option>
-            <option value="CORSE-DU-SUD">CORSE-DU-SUD</option>
-            <option value="CORUM">CORUM</option>
-            <option value="COTE D'OR">COTE D'OR</option>
-            <option value="COTES-D'ARMOR">COTES-D'ARMOR</option>
-            <option value="CREUSE">CREUSE</option>
-            <option value="CUENCA">CUENCA</option>
-            <option value="DN">Dadra and Nagar Haveli</option>
-            <option value="DD">Daman and Diu</option>
-            <option value="DE">Delaware</option>
-            <option value="DL">Delhi</option>
-            <option value="DENIZLI">DENIZLI</option>
-            <option value="DEUX-SEVRES">DEUX-SEVRES</option>
-            <option value="DC">District of Columbia</option>
-            <option value="DF">Distrito Federal</option>
-            <option value="DIYARBAKIR">DIYARBAKIR</option>
-            <option value="DORDOGNE">DORDOGNE</option>
-            <option value="DOUBS">DOUBS</option>
-            <option value="DROME">DROME</option>
-            <option value="DUZCE">DUZCE</option>
-            <option value="EDIRNE">EDIRNE</option>
-            <option value="EHIME-KEN">EHIME-KEN</option>
-            <option value="ELAZIG">ELAZIG</option>
-            <option value="ERZINCAN">ERZINCAN</option>
-            <option value="ERZURUM">ERZURUM</option>
-            <option value="ESKISEHIR">ESKISEHIR</option>
-            <option value="ES">Esp&iacute;rito Santo</option>
-            <option value="ESSONNE">ESSONNE</option>
-            <option value="EURE">EURE</option>
-            <option value="EURE-ET-LOIR">EURE-ET-LOIR</option>
-            <option value="FINISTERE">FINISTERE</option>
-            <option value="FL">Florida</option>
-            <option value="FJ">Fujian Province</option>
-            <option value="FUKUI-KEN">FUKUI-KEN</option>
-            <option value="FUKUOKA-KEN">FUKUOKA-KEN</option>
-            <option value="FUKUSHIMA">FUKUSHIMA</option>
-            <option value="GS">Gansu Province</option>
-            <option value="GARD">GARD</option>
-            <option value="GAZIANTEP">GAZIANTEP</option>
-            <option value="GA">Georgia</option>
-            <option value="GERS">GERS</option>
-            <option value="GIFU-KEN">GIFU-KEN</option>
-            <option value="GIRESUN">GIRESUN</option>
-            <option value="GIRONA">GIRONA</option>
-            <option value="GIRONDE">GIRONDE</option>
-            <option value="GA">Goa</option>
-            <option value="GO">Goi&aacute;s</option>
-            <option value="GRANADA">GRANADA</option>
-            <option value="GUADALAJARA">GUADALAJARA</option>
-            <option value="GUADELOUPE">GUADELOUPE</option>
-            <option value="GD">Guangdong Province</option>
-            <option value="GX">Guangxi Zhuang Autonomous Region</option>
-            <option value="GUIP&Uacute;ZCOA">GUIP&Uacute;ZCOA</option>
-            <option value="GZ">Guizhou Province</option>
-            <option value="GJ">Gujarat</option>
-            <option value="GUMUSHANE">GUMUSHANE</option>
-            <option value="GUNMA-KEN">GUNMA-KEN</option>
-            <option value="GUYANE">GUYANE</option>
-            <option value="HI">Hainan Province</option>
-            <option value="HAKKARI">HAKKARI</option>
-            <option value="HAMBURG">HAMBURG</option>
-            <option value="HR">Haryana</option>
-            <option value="HATAY">HATAY</option>
-            <option value="HAUTE-CORSE">HAUTE-CORSE</option>
-            <option value="HAUTE-GARONNE">HAUTE-GARONNE</option>
-            <option value="HAUTE-LOIRE">HAUTE-LOIRE</option>
-            <option value="HAUTE-MARNE">HAUTE-MARNE</option>
-            <option value="HAUTES-ALPES">HAUTES-ALPES</option>
-            <option value="HAUTE-SAONE">HAUTE-SAONE</option>
-            <option value="HAUTE-SAVOIE">HAUTE-SAVOIE</option>
-            <option value="HAUTES-PYRENEES">HAUTES-PYRENEES</option>
-            <option value="HAUTE-VIENNE">HAUTE-VIENNE</option>
-            <option value="HAUT-RHIN">HAUT-RHIN</option>
-            <option value="HAUTS-DE-SEINE">HAUTS-DE-SEINE</option>
-            <option value="HI">Hawaii</option>
-            <option value="HE">Hebei Province</option>
-            <option value="HL">Heilongjiang Province</option>
-            <option value="HA">Henan Province</option>
-            <option value="HERAULT">HERAULT</option>
-            <option value="HESSE">HESSE</option>
-            <option value="HP">Himachal Pradesh</option>
-            <option value="HIROSHIMA">HIROSHIMA</option>
-            <option value="HOKKAIDO">HOKKAIDO</option>
-            <option value="HK">Hong Kong Special Administrative Region</option>
-            <option value="HB">Hubei Province</option>
-            <option value="HUELVA">HUELVA</option>
-            <option value="HUESCA">HUESCA</option>
-            <option value="HN">Hunan Province</option>
-            <option value="HYOGO-KEN">HYOGO-KEN</option>
-            <option value="IBARAKI-KEN">IBARAKI-KEN</option>
-            <option value="ID">Idaho</option>
-            <option value="IGDIR">IGDIR</option>
-            <option value="ILLE-ET-VILAINE">ILLE-ET-VILAINE</option>
-            <option value="IL">Illinois</option>
-            <option value="IN">Indiana</option>
-            <option value="INDRE">INDRE</option>
-            <option value="INDRE-ET-LOIRE">INDRE-ET-LOIRE</option>
-            <option value="NM">Inner Mongolia Autonomous Region</option>
-            <option value="IA">Iowa</option>
-            <option value="ISERE">ISERE</option>
-            <option value="ISHIKAWA">ISHIKAWA</option>
-            <option value="ISPARTA">ISPARTA</option>
-            <option value="ISTANBUL">ISTANBUL</option>
-            <option value="IWATE-KEN">IWATE-KEN</option>
-            <option value="IZMIR">IZMIR</option>
-            <option value="JA&Eacute;N">JA&Eacute;N</option>
-            <option value="JK">Jammu and Kashmir</option>
-            <option value="JH">Jharkhand</option>
-            <option value="JS">Jiangsu Province</option>
-            <option value="JX">Jiangxi Province</option>
-            <option value="JL">Jilin Province</option>
-            <option value="JURA">JURA</option>
-            <option value="KAGAWA-KEN">KAGAWA-KEN</option>
-            <option value="KAGOSHIMA">KAGOSHIMA</option>
-            <option value="KAHRAMANMARAS">KAHRAMANMARAS</option>
-            <option value="KANAGAWA">KANAGAWA</option>
-            <option value="KS">Kansas</option>
-            <option value="KARABUK">KARABUK</option>
-            <option value="KARAMAN">KARAMAN</option>
-            <option value="KA">Karnataka</option>
-            <option value="KARS">KARS</option>
-            <option value="KASTAMONU">KASTAMONU</option>
-            <option value="KAYSERI">KAYSERI</option>
-            <option value="KY">Kentucky</option>
-            <option value="KL">Kerala</option>
-            <option value="KILIS">KILIS</option>
-            <option value="KIRIKKALE">KIRIKKALE</option>
-            <option value="KIRKLARELI">KIRKLARELI</option>
-            <option value="KIRSEHIR">KIRSEHIR</option>
-            <option value="KOCAELI">KOCAELI</option>
-            <option value="KOCHI-KEN">KOCHI-KEN</option>
-            <option value="KONYA">KONYA</option>
-            <option value="KUMAMOTO">KUMAMOTO</option>
-            <option value="KUTAHYA">KUTAHYA</option>
-            <option value="KYOTO-FU">KYOTO-FU</option>
-            <option value="LA RIOJA">LA RIOJA</option>
-            <option value="LD">Lakshadweep</option>
-            <option value="LANDES">LANDES</option>
-            <option value="LAS PALMAS">LAS PALMAS</option>
-            <option value="LE&Oacute;N">LE&Oacute;N</option>
-            <option value="L&Eacute;RIDA">L&Eacute;RIDA</option>
-            <option value="LN">Liaoning Province</option>
-            <option value="LLEIDA">LLEIDA</option>
-            <option value="LOIRE">LOIRE</option>
-            <option value="LOIRE-ATLANTIQUE">LOIRE-ATLANTIQUE</option>
-            <option value="LOIRET">LOIRET</option>
-            <option value="LOIR-ET-CHER">LOIR-ET-CHER</option>
-            <option value="LOT">LOT</option>
-            <option value="LOT-ET-GARONNE">LOT-ET-GARONNE</option>
-            <option value="LA">Louisiana</option>
-            <option value="LOWER SAXONY">LOWER SAXONY</option>
-            <option value="LOZERE">LOZERE</option>
-            <option value="LUGO">LUGO</option>
-            <option value="MC">Macau Special Administrative Region</option>
-            <option value="MP">Madhya Pradesh</option>
-            <option value="MADRID">MADRID</option>
-            <option value="MH">Maharashtra</option>
-            <option value="ME">Maine</option>
-            <option value="MAINE-ET-LOIRE">MAINE-ET-LOIRE</option>
-            <option value="MALAGA">MALAGA</option>
-            <option value="MALATYA">MALATYA</option>
-            <option value="MANCHE">MANCHE</option>
-            <option value="MN">Manipur</option>
-            <option value="MANISA">MANISA</option>
-            <option value="MA">Maranh&atilde;o</option>
-            <option value="MARDIN">MARDIN</option>
-            <option value="MARNE">MARNE</option>
-            <option value="MARTINIQUE">MARTINIQUE</option>
-            <option value="MD">Maryland</option>
-            <option value="MA">Massachusetts</option>
-            <option value="MT">MatoGrosso</option>
-            <option value="MS">MatoGrosso do Sul</option>
-            <option value="MAYENNE">MAYENNE</option>
-            <option value="MECKLENBURG-WESTERN POMERANIA">MECKLENBURG-WESTERN POMERANIA</option>
-            <option value="ML">Meghalaya</option>
-            <option value="MELILLA">MELILLA</option>
-            <option value="MERSIN">MERSIN</option>
-            <option value="MEURTHE-ET-MOSELLE">MEURTHE-ET-MOSELLE</option>
-            <option value="MEUSE">MEUSE</option>
-            <option value="MI">Michigan</option>
-            <option value="MIE-KEN">MIE-KEN</option>
-            <option value="MG">Minas Gerais</option>
-            <option value="MN">Minnesota</option>
-            <option value="MS">Mississippi</option>
-            <option value="MO">Missouri</option>
-            <option value="MIYAGI-KEN">MIYAGI-KEN</option>
-            <option value="MIYAZAKI">MIYAZAKI</option>
-            <option value="MZ">Mizoram</option>
-            <option value="MT">Montana</option>
-            <option value="MORBIHAN">MORBIHAN</option>
-            <option value="MOSELLE">MOSELLE</option>
-            <option value="MUGLA">MUGLA</option>
-            <option value="MURCIA">MURCIA</option>
-            <option value="MUS">MUS</option>
-            <option value="NL">Nagaland</option>
-            <option value="NAGANO-KEN">NAGANO-KEN</option>
-            <option value="NAGASAKI">NAGASAKI</option>
-            <option value="NARA-KEN">NARA-KEN</option>
-            <option value="NAVARRA">NAVARRA</option>
-            <option value="NE">Nebraska</option>
-            <option value="NV">Nevada</option>
-            <option value="NEVSEHIR">NEVSEHIR</option>
-            <option value="NH">New Hampshire</option>
-            <option value="NJ">New Jersey</option>
-            <option value="NM">New Mexico</option>
-            <option value="NSW">New South Wales</option>
-            <option value="NY">New York</option>
-            <option value="NIEVRE">NIEVRE</option>
-            <option value="NIGDE">NIGDE</option>
-            <option value="NIIGATA-KEN">NIIGATA-KEN</option>
-            <option value="NX">Ningxia Hui Autonomous Region</option>
-            <option value="NORD">NORD</option>
-            <option value="NC">North Carolina</option>
-            <option value="ND">North Dakota</option>
-            <option value="NORTH RHINE-WESTPHALIA">NORTH RHINE-WESTPHALIA</option>
-            <option value="NT">Northern Territory</option>
-            <option value="OR">Odisha</option>
-            <option value="OH">Ohio</option>
-            <option value="OISE">OISE</option>
-            <option value="OITA-KEN">OITA-KEN</option>
-            <option value="OKAYAMA-KEN">OKAYAMA-KEN</option>
-            <option value="OKINAWA-KEN">OKINAWA-KEN</option>
-            <option value="OK">Oklahoma</option>
-            <option value="ORDU">ORDU</option>
-            <option value="OR">Oregon</option>
-            <option value="ORNE">ORNE</option>
-            <option value="OSAKA-FU">OSAKA-FU</option>
-            <option value="OSMANIYE">OSMANIYE</option>
-            <option value="OURENSE">OURENSE</option>
-            <option value="PALENCIA">PALENCIA</option>
-            <option value="PA">Par&aacute;</option>
-            <option value="PB">Para&iacute;ba</option>
-            <option value="PR">Paran&aacute;</option>
-            <option value="PARIS">PARIS</option>
-            <option value="PAS-DE-CALAIS">PAS-DE-CALAIS</option>
-            <option value="PA">Pennsylvania</option>
-            <option value="PE">Pernambuco</option>
-            <option value="PI">Piau&iacute;</option>
-            <option value="PONTEVEDRA">PONTEVEDRA</option>
-            <option value="PY">Puducherry</option>
-            <option value="PB">Punjab</option>
-            <option value="PUY-DE-DOME">PUY-DE-DOME</option>
-            <option value="PYRENEES-ATLANTIQUES">PYRENEES-ATLANTIQUES</option>
-            <option value="PYRENEES-ORIENTALES">PYRENEES-ORIENTALES</option>
-            <option value="QH">Qinghai Province</option>
-            <option value="QLD">Queensland</option>
-            <option value="RJ">Rajasthan</option>
-            <option value="RHINELAND-PALATINATE">RHINELAND-PALATINATE</option>
-            <option value="RI">Rhode Island</option>
-            <option value="RHONE">RHONE</option>
-            <option value="RJ">Rio de Janeiro</option>
-            <option value="RN">Rio Grande do Norte</option>
-            <option value="RS">Rio Grande do Sul</option>
-            <option value="RIZE">RIZE</option>
-            <option value="RO">Rond&ocirc;nia</option>
-            <option value="RR">Roraima</option>
-            <option value="SAARLAND">SAARLAND</option>
-            <option value="SAGA-KEN">SAGA-KEN</option>
-            <option value="SAITAMA-KEN">SAITAMA-KEN</option>
-            <option value="SAKARYA">SAKARYA</option>
-            <option value="SALAMANCA">SALAMANCA</option>
-            <option value="SAMSUN">SAMSUN</option>
-            <option value="SANLIURFA">SANLIURFA</option>
-            <option value="SC">Santa Catarina</option>
-            <option value="SANTA CRUZ DE TENERIFE">SANTA CRUZ DE TENERIFE</option>
-            <option value="SP">S&atilde;o Paulo</option>
-            <option value="SAONE-ET-LOIRE">SAONE-ET-LOIRE</option>
-            <option value="SARTHE">SARTHE</option>
-            <option value="SAVOIE">SAVOIE</option>
-            <option value="SAXONY">SAXONY</option>
-            <option value="SAXONY-ANHALT">SAXONY-ANHALT</option>
-            <option value="SCHLESWIG-HOLSTEIN">SCHLESWIG-HOLSTEIN</option>
-            <option value="SEGOVIA">SEGOVIA</option>
-            <option value="SEINE-ET-MARNE">SEINE-ET-MARNE</option>
-            <option value="SEINE-MARITIME">SEINE-MARITIME</option>
-            <option value="SEINE-SAINT-DENIS">SEINE-SAINT-DENIS</option>
-            <option value="SE">Sergipe</option>
-            <option value="SEVILLA">SEVILLA</option>
-            <option value="SN">Shaanxi Province</option>
-            <option value="SD">Shandong Province</option>
-            <option value="SH">Shanghai Municipality</option>
-            <option value="SX">Shanxi Province</option>
-            <option value="SHIGA-KEN">SHIGA-KEN</option>
-            <option value="SHIMANE-KEN">SHIMANE-KEN</option>
-            <option value="SHIZUOKA">SHIZUOKA</option>
-            <option value="SC">Sichuan Province</option>
-            <option value="SIIRT">SIIRT</option>
-            <option value="SK">Sikkim</option>
-            <option value="SINOP">SINOP</option>
-            <option value="SIRNAK">SIRNAK</option>
-            <option value="SIVAS">SIVAS</option>
-            <option value="SOMME">SOMME</option>
-            <option value="SORIA">SORIA</option>
-            <option value="SA">South Australia</option>
-            <option value="SC">South Carolina</option>
-            <option value="SD">South Dakota</option>
-            <option value="TW">Taiwan Province</option>
-            <option value="TN">Tamil Nadu</option>
-            <option value="TARN">TARN</option>
-            <option value="TARN-ET-GARONNE">TARN-ET-GARONNE</option>
-            <option value="TARRAGONA">TARRAGONA</option>
-            <option value="TAS">Tasmania</option>
-            <option value="TEKIRDAG">TEKIRDAG</option>
-            <option value="TG">Telangana</option>
-            <option value="TN">Tennessee</option>
-            <option value="TERRITOIRE DE BELFORT">TERRITOIRE DE BELFORT</option>
-            <option value="TERUEL">TERUEL</option>
-            <option value="TX">Texas</option>
-            <option value="THURINGIA">THURINGIA</option>
-            <option value="TJ">Tianjin Municipality</option>
-            <option value="XZ">Tibet Autonomous Region</option>
-            <option value="TO">Tocantins</option>
-            <option value="TOCHIGI-KEN">TOCHIGI-KEN</option>
-            <option value="TOKAT">TOKAT</option>
-            <option value="TOKUSHIMA">TOKUSHIMA</option>
-            <option value="TOKYO-TO">TOKYO-TO</option>
-            <option value="TOLEDO">TOLEDO</option>
-            <option value="TOTTORI">TOTTORI</option>
-            <option value="TOYAMA-KEN">TOYAMA-KEN</option>
-            <option value="TRABZON">TRABZON</option>
-            <option value="TR">Tripura</option>
-            <option value="TUNCELI">TUNCELI</option>
-            <option value="AE">U.S. Armed Forces &ndash;&nbsp;Europe</option>
-            <option value="AP">U.S. Armed Forces &ndash;&nbsp;Pacific</option>
-            <option value="AA">U.S. Armed Forces&nbsp;&ndash;&nbsp;Americas</option>
-            <option value="USAK">USAK</option>
-            <option value="UT">Utah</option>
-            <option value="UP">Uttar Pradesh</option>
-            <option value="UT">Uttarakhand</option>
-            <option value="VAL-DE-MARNE">VAL-DE-MARNE</option>
-            <option value="VAL-D'OISE">VAL-D'OISE</option>
-            <option value="VALENCIA">VALENCIA</option>
-            <option value="VALLADOLID">VALLADOLID</option>
-            <option value="VAN">VAN</option>
-            <option value="VAR">VAR</option>
-            <option value="VAUCLUSE">VAUCLUSE</option>
-            <option value="VENDEE">VENDEE</option>
-            <option value="VT">Vermont</option>
-            <option value="VIC">Victoria</option>
-            <option value="VIENNE">VIENNE</option>
-            <option value="VA">Virginia</option>
-            <option value="VIZCAYA">VIZCAYA</option>
-            <option value="VOSGES">VOSGES</option>
-            <option value="WAKAYAMA">WAKAYAMA</option>
-            <option value="WA">Washington</option>
-            <option value="WB">West Bengal</option>
-            <option value="WV">West Virginia</option>
-            <option value="WA">Western Australia</option>
-            <option value="WI">Wisconsin</option>
-            <option value="WY">Wyoming</option>
-            <option value="XJ">Xinjiang Uyghur Autonomous Region</option>
-            <option value="YALOVA">YALOVA</option>
-            <option value="YAMAGATA">YAMAGATA</option>
-            <option value="YAMAGUCHI">YAMAGUCHI</option>
-            <option value="YAMANASHI">YAMANASHI</option>
-            <option value="YONNE">YONNE</option>
-            <option value="YOZGAT">YOZGAT</option>
-            <option value="YN">Yunnan Province</option>
-            <option value="YVELINES">YVELINES</option>
-            <option value="ZAMORA">ZAMORA</option>
-            <option value="ZARAGOZA">ZARAGOZA</option>
-            <option value="ZJ">Zhejiang Province</option>
-            <option value="ZONGULDAK">ZONGULDAK</option>
+        <div class="form-group col-md-6 col-lg-6">
+          <label for="state_province">Estado / Provincia</label>
+          <select name="State_Province" id="state_province" class="form-control">
           </select>
         </div>
       </div>
 
       <div class="row">
-        <div class="form-group col-md-12 col-lg-12"><label for="contact_form_comments">Comentarios <span class="parsley-required">*</span></label>
-          <textarea class="form-control" id="contact_form_comments" name="contact_form_comments" required=""></textarea></div>
+        <div class="form-group col-xs-12">
+          <label for="contact_form_comments">Comentarios<span class="parsley-required"> *</span></label>
+          <textarea name="Contact Form Comments" id="contact_form_comments" class="form-control" required></textarea>
+        </div>
       </div>
 
       <div class="row">
