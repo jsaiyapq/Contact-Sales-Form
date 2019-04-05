@@ -2,6 +2,14 @@
 <head>
 <title>Contact Us - ProQuest</title>
 
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-PKTQGK');</script>
+<!-- End Google Tag Manager -->
+
 <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans" />
 <link rel="stylesheet" type="text/css" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" />
 <style type="text/css">
@@ -99,8 +107,8 @@ form#pq-contact .tooltip-arrow { /* id needed here for specificity */
 <script src="https://cdnjs.cloudflare.com/ajax/libs/parsley.js/2.7.2/parsley.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.2.1/jquery.form.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
-<!--<script src="https://www.proquest.com/includes/pq-form-utils.js"></script>-->
-<script src="https://stage.www.proquest.com/includes/pq-form-utils.js"></script>  <!-- //////////////// FOR TESTING //////////////// -->
+<script src="https://www.proquest.com/includes/pq-form-utils.js?cacheBuster=1"></script>
+<!--<script src="https://stage.www.proquest.com/includes/pq-form-utils.js"></script>-->  <!-- //////////////// FOR TESTING //////////////// -->
 <script>
 /*
  * Document Ready function
@@ -116,11 +124,9 @@ $( document ).ready(function() {
   $('[data-toggle="tooltip"]').tooltip();
 
   // from pq-form-utils.js
-  startFormUtils('pq-contact', 'first_name', 'email', 'country', 'state_province', 'market', 'submarket', 'job_function', 'job_function_other');
+  initFormUtils('pq-contact', 'first_name', 'email', 'country', 'state_province', 'market', 'submarket', 'job_function', 'job_function_other');
 
-  // lock the email field
-  //  only if the hidden field with a recipient's ID is present
-  //  and there is content in the email field (allows us to enter a new email if something goes wrong)
+  // if the email field has been locked, display a warning and a way to clear the form
   if ( $('[name="RECIPIENT_ID_*"]').length && $('#email').val().length ) {
 
     // put the user`s first name in the "Clear the form" prompt
@@ -159,6 +165,11 @@ $( document ).ready(function() {
 
 <body class="grey">
 
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PKTQGK"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
   <div class="modal fade" id="email-warning" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -175,7 +186,7 @@ $( document ).ready(function() {
 
   <div class="row sectionBlock">
     <div class="col-ss-12 col-sm-10 col-md-8 col-lg-6 col-centered">
-      <p id="clear-identity-prompt">Not <span id="first_name_span"></span>? <a href="#" class="clear-identity-action" name="clear_form" xt="SPNOTRACK">Clear the form</a>.</p>
+      <p id="clear-identity-prompt">Not <span id="first_name_span">&nbsp;</span>? <a href="#" class="clear-identity-action" name="clear_form" xt="SPNOTRACK">Clear the form</a>.</p>
 
       <form name="pq-contact" id="pq-contact" class="pq-contact" method="POST" role="form" target="_parent" autocomplete="off">
       <!-- Autocomplete set to "off" for compatibility workaround for Firefox. -->
@@ -1143,16 +1154,6 @@ $( document ).ready(function() {
       </form>
     </div>
   </div>
-
-<!-- Google Tag Manager -->
-<script>
-(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-PKTQGK');
-</script>
-<!-- End Google Tag Manager -->
 
 </body>
 </html>

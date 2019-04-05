@@ -1,21 +1,56 @@
 /* ########################################  PQ Form Utils  ########################################
+@title   ProQuest Form Utilities
+@author  Jim Saiya
+@date    2019-03-22
 
    A $(document).ready() JQuery function must be added to the JavaScript on the form .html page.
 
    $(document).ready(function(e) {
-     startFormUtils([form id],[default focus element id],[email element id],[country element id],[state/province element id],
+     initFormUtils([form id],[default focus element id],[email element id],[country element id],[state/province element id],
       [market element id],[sub-market element id],[job function element id],[other job function element id]);
    });
 
    EXAMPLE - change these values to match your field ids:
-     startFormUtils('pq-contact', 'firstname', 'email', 'country', 'state_province', 'market', 'submarket', 'job_function', 'job_function_other');
+     initFormUtils('pq-contact', 'firstname', 'email', 'country', 'state_province', 'market', 'submarket', 'job_function', 'job_function_other');
 
    ################################################################################################# */
 
 
+// *** LEGACY *** Function to initialize utilities
+//  This will to be called by deployed Landing Pages that were based on the Base LP Templates
+//  New forms will call initFormUtils() (below) instead
+function startFormUtils(sfuForm, sfuCountry, sfuStateprov, sfuMarket, sfuSubmarket, sfuEmail, sfuDefaultField) {
+
+	checkMarketSubmarket('init', sfuMarket, sfuSubmarket);
+	$('#'+sfuMarket).change(function(e) {
+		checkMarketSubmarket('change', sfuMarket, sfuSubmarket);
+	});
+
+	checkCountryState('init', sfuCountry, sfuStateprov);
+	$('#'+sfuCountry).change(function(e) {
+		checkCountryState('change', sfuCountry, sfuStateprov);
+	});
+
+	if ( $('[name="RECIPIENT_ID_*"]').length ) {  // there is a cookie for this page
+
+		if ( !$('#'+sfuSubmarket).val() ) {
+			console.error('Browser form error. '+sfuSubmarket+' field is empty.');
+		}
+
+		// Bind clearIdentity() function to all links that clear the form
+		$('.clear-identity-action').click(function(e) {
+			e.preventDefault();						// don't reload the page
+			checkCountryState('init', sfuCountry, sfuStateprov);		// reset the State/Province field if needed
+		});
+
+	}
+
+}
+
+
 // Function to initialize utilities
 //  Call this from within a $(document).ready() JQuery function on the form page
-function startFormUtils(sfuForm, sfuDefaultField, sfuEmail, sfuCountry, sfuStateprov, sfuMarket, sfuSubmarket, sfuJobFunc, sfuOtherJobFunc) {
+function initFormUtils(sfuForm, sfuDefaultField, sfuEmail, sfuCountry, sfuStateprov, sfuMarket, sfuSubmarket, sfuJobFunc, sfuOtherJobFunc) {
 
 	checkJobFunction('init', sfuJobFunc, sfuOtherJobFunc);
 	$('#'+sfuJobFunc).change(function(e) {
@@ -68,10 +103,10 @@ function initFormIdentityLink(sfuForm, sfuDefaultField, sfuEmail, sfuCountry, sf
 	// Show the "Clear the form" prompt
 	$('#clear-identity-prompt').show();
 
-	// Bind clearIdentity() function to all links that clear the form
+	// Bind clearUserIdentity() function to all links that clear the form
 	$('.clear-identity-action').click(function(e) {
 		e.preventDefault();						// don't reload the page
-		clearIdentity(sfuForm, sfuEmail);				// clear the form
+		clearUserIdentity(sfuForm, sfuEmail);				// clear the form
 		checkJobFunction('init', sfuJobFunc, sfuOtherJobFunc);		// reset the Other Job Function field
 		checkCountryState('init', sfuCountry, sfuStateprov);		// reset the State/Province field if needed
 		$('#'+sfuDefaultField).focus();					// focus on the default field for the form
@@ -81,7 +116,7 @@ function initFormIdentityLink(sfuForm, sfuDefaultField, sfuEmail, sfuCountry, sf
 
 
 // Function to clear the contact form, including cookie and hidden recipient id field
-function clearIdentity(sfuForm, sfuEmail) {
+function clearUserIdentity(sfuForm, sfuEmail) {
 
 	// Clear the cookie
 //	var remove_sp_identity = $.removeCookie('SP_IDENTITY');

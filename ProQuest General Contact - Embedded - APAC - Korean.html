@@ -3,6 +3,14 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <title>Contact Us - ProQuest</title>
 
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-PKTQGK');</script>
+<!-- End Google Tag Manager -->
+
   <link rel="stylesheet" type="text/css" href="https://www.proquest.com/includes/bootstrap.css" />
   <link rel="stylesheet" type="text/css" href="https://www.proquest.com/includes/font-awesome.min.css" />
   <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,400,300,700,600" />
@@ -26,6 +34,9 @@
     .parsley-type {
       color: #a51f1e;
     }
+    #clear-identity-prompt {
+      display: none;
+    }
     form label {
       font-size: 15px !important;
     }
@@ -39,8 +50,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/parsley.js/2.7.2/parsley.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.2.1/jquery.form.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
-  <!--<script src="https://www.proquest.com/includes/pq-form-utils.js"></script>-->
-  <script src="https://stage.www.proquest.com/includes/pq-form-utils.js"></script>  <!-- //////////////// FOR TESTING //////////////// -->
+  <script src="https://www.proquest.com/includes/pq-form-utils.js?cacheBuster=1"></script>
+  <!--<script src="https://stage.www.proquest.com/includes/pq-form-utils.js"></script>-->  <!-- //////////////// FOR TESTING //////////////// -->
   <script>
     /*
      * Document Ready function
@@ -56,26 +67,22 @@
       $('[data-toggle="tooltip"]').tooltip();
 
       // from pq-form-utils.js
-      startFormUtils('pq-contact', 'first_name', 'email', 'country', 'state_province', 'market', 'submarket', 'job_function', 'job_function_other');
+      initFormUtils('pq-contact', 'first_name', 'email', 'country', 'state_province', 'market', 'submarket', 'job_function', 'job_function_other');
 
-      // lock the email field
-      //  only if the hidden field with a recipient's ID is present
-      //  and there is content in the email field (allows us to enter a new email if something goes wrong)
-      if ( $('[name="RECIPIENT_ID_*"]').length && $('#email').val().length ) {
+      // if the email field has been locked, display [a warning and] a way to clear the form
+      if ( $('[name="RECIPIENT_ID_*"]').length ) {
 
         // put the user`s first name in the "Clear the form" prompt
         $('#first_name_span').html($('#first_name').val());
 
-        // show the email warning in a dialog
-        $('#email-warning').modal('show');
-        // and because Firefox sometimes doesn't make the dialog appear...
-        $('#email-warning').css('display', 'block');
+        // show the email warning prompt
+//        $('#email-warning').show();  // int'l forms don't have a warning ////////////////
 
-        // put the focus on the Comments field after dialog is dismissed
-        $('#email-warning').on('hidden.bs.modal', function() {
+        // if data exists, clear the Comments field and put the focus on it
+        if ( $('[name="RECIPIENT_ID_*"]').length ) {
           $('#contact_form_comments').val('');
           $('#contact_form_comments').focus();
-        })
+        }
 
       }
 
@@ -97,9 +104,14 @@
 
 <body style="overflow: hidden;">  <!-- 'overflow: hidden' makes sure there are no scrollbars on the iframe -->
 
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PKTQGK"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
 <div class="row">
   <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-    <h2>Talk to Us</h2>
+    <h2 class="firstColheader">Talk to Us</h2>
     <p>더 필요하신 정보가 있으신가요? 양식을 작성해 주시면 담당 직원이 연락 드리겠습니다.</p>
     <p>ProQuest 사는 미국 미시건주에 본사를 두고 있으며 전세계에 지사가 있습니다. <a href="https://www.proquest.com/about/locations/" target="_parent" name="locations" xt="SPCLICKSTREAM">지사 보기</a>.</p>
     <h3>Contact Support</h3>
@@ -108,7 +120,7 @@
   </div>
 
   <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-    <p id="clear-identity-prompt"><span id="first_name_span"></span>이/가 아닌가요? <a href="#" class="clear-identity-action" name="clear_form" xt="SPNOTRACK">새로 작성하기</a>.</p>
+    <p id="clear-identity-prompt"><span id="first_name_span">&nbsp;</span>이/가 아닌가요? <a href="#" class="clear-identity-action" name="clear_form" xt="SPNOTRACK">새로 작성하기</a>.</p>
 
     <form name="pq-contact" id="pq-contact" class="pq-contact" method="POST" role="form" autocomplete="off">
     <!-- Autocomplete set to "off" for compatibility workaround for Firefox. -->
@@ -1059,16 +1071,6 @@
     </form>
   </div>
 </div>
-
-<!-- Google Tag Manager -->
-<script>
-(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-PKTQGK');
-</script> 
-<!-- End Google Tag Manager -->
 
 </body>
 </html>
