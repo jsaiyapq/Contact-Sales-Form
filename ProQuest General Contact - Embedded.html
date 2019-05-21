@@ -62,14 +62,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 .parsley-error:focus {
   border: 2px solid #a51f1e;
 }
-.parsley-errors-list {
-  color: #a51f1e;
-  margin-bottom: 0; /* added */
-}
 .parsley-required {
   color: #a51f1e;
 }
-.parsley-type {
+.parsley-error-message {
   color: #a51f1e;
 }
 form#pq-contact {
@@ -107,8 +103,8 @@ form#pq-contact .tooltip-arrow { /* id needed here for specificity */
 <script src="https://cdnjs.cloudflare.com/ajax/libs/parsley.js/2.7.2/parsley.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.2.1/jquery.form.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
-<script src="https://www.proquest.com/includes/pq-form-utils.js?cacheBuster=1"></script>
-<!--<script src="https://stage.www.proquest.com/includes/pq-form-utils.js"></script>-->  <!-- //////////////// FOR TESTING //////////////// -->
+<!--<script src="https://www.proquest.com/includes/pq-form-utils.js?cacheBuster=1"></script>-->  <!-- For Production -->
+<script src="https://stage.www.proquest.com/includes/pq-form-utils.js?cacheBuster=1"></script>  <!-- //////////////// FOR TESTING //////////////// -->
 <script>
 /*
  * Document Ready function
@@ -118,7 +114,20 @@ $( document ).ready(function() {
   console.log('\nBegin Doc Ready.'); ////////////////
 
   // set up Parsley
-  $('#pq-contact').parsley({ excluded: ':hidden', errorMessage: '', requiredMessage: '' });
+  var parsleyForm = $('#pq-contact').parsley({ errorsMessagesDisabled: true });  // we handle display of error messages
+
+  // display/hide validation error messages near the fields
+  $('#pq-contact').parsley().on('field:validated', function() {
+    if (this.validationResult === true) {
+      this.$element.prevAll('.parsley-error-message').addClass('hidden');
+    } else {
+      if ( this.element.value != '' ) {  // currently the only error message we display is `Email format is not valid`
+        this.$element.prev('.parsley-error-message').removeClass('hidden');
+      } else {  // no message for missing value
+        this.$element.prevAll('.parsley-error-message').addClass('hidden');
+      }
+    }
+  });
 
   // enable Bootstrap tooltip for email field
   $('[data-toggle="tooltip"]').tooltip();
@@ -146,6 +155,20 @@ $( document ).ready(function() {
     })
 
   }
+
+  // enable the Submit button if the Double OptIn checkbox is checked on load
+  if ( $('#double_optin').prop('checked') ) {
+    $('#submit').prop('disabled', false);
+  }
+
+  // toggle the Submit button when the Double OptIn checkbox changes
+  $('#double_optin').change(function() {
+    if ( $('#double_optin').prop('checked') ) {
+      $('#submit').prop('disabled', false);
+    } else {
+      $('#submit').prop('disabled', true);
+    }
+  });
 
   // set values for hidden fields that could have been overwritten by auto-populate on the server
   $('#LeadStatus').val('Sales Ready');
@@ -194,18 +217,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="row">
           <div class="form-group col-ss-6">
             <label class="pq-form-label" for="first_name">First Name<span class="parsley-required"> *</span></label>
-            <input type="text" name="First Name" id="first_name" class="form-control" required />
+            <input type="text" name="First Name" id="first_name" class="form-control" maxlength="30" required />
           </div>
           <div class="form-group col-ss-6">
             <label class="pq-form-label" for="last_name">Last Name<span class="parsley-required"> *</span></label>
-            <input type="text" name="Last Name" id="last_name" class="form-control" required />
+            <input type="text" name="Last Name" id="last_name" class="form-control" maxlength="45" required />
           </div>
         </div>
 
         <div class="row">
           <div class="form-group col-xs-12">
             <label class="pq-form-label" for="company">Organization<span class="parsley-required"> *</span></label>
-            <input type="text" name="Company" id="company" class="form-control" required />
+            <input type="text" name="Company" id="company" class="form-control" maxlength="100" required />
           </div>
         </div>
 
@@ -255,7 +278,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           </div>
           <div class="form-group col-sm-6">
             <label class="pq-form-label" for="job_function_other">Other Job Function (specify)</label>
-            <input type="text" name="Job Function Other" id="job_function_other" class="form-control" />
+            <input type="text" name="Job Function Other" id="job_function_other" class="form-control" maxlength="255" />
           </div>
         </div>
 
@@ -387,13 +410,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="row">
           <div class="form-group col-ss-6">
             <label class="pq-form-label" for="email">Email<span class="parsley-required"> *</span></label>
-            <input type="text" name="Email" id="email" class="form-control" required
+            <span class="parsley-error-message  hidden">Email format is not valid</span>
+            <input type="text" name="Email" id="email" class="form-control" data-parsley-type="email" maxlength="60" required
             data-toggle="tooltip" data-placement="top"
             title="For security purposes and protection of customer data, you will not be able to change your email address once the form has been submitted." />
           </div>
           <div class="form-group col-ss-6">
             <label class="pq-form-label" for="phone">Phone</label>
-            <input type="text" name="Phone" id="phone" class="form-control" />
+            <input type="text" name="Phone" id="phone" class="form-control" maxlength="35" />
           </div>
         </div>
 
@@ -1113,6 +1137,22 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               <option value="ZARAGOZA">ZARAGOZA</option>
               <option value="ZJ">Zhejiang Province</option>
               <option value="ZONGULDAK">ZONGULDAK</option>
+ <option value="Baden-Württemberg">Baden-Württemberg</option> 
+ <option value="Bavaria">Bavaria</option> 
+ <option value="Berlin">Berlin</option> 
+ <option value="Brandenburg">Brandenburg</option> 
+ <option value="Bremen">Bremen</option> 
+ <option value="Hamburg">Hamburg</option> 
+ <option value="Hessen">Hessen</option> 
+ <option value="Lower Saxony">Lower Saxony</option> 
+ <option value="Mecklenburg-Western Pomerania">Mecklenburg-Western Pomerania</option> 
+ <option value="North Rhine-Westphalia">North Rhine-Westphalia</option> 
+ <option value="Rhineland-Palatinate">Rhineland-Palatinate</option> 
+ <option value="Saarland">Saarland</option> 
+ <option value="Saxony">Saxony</option> 
+ <option value="Saxony-Anhalt">Saxony-Anhalt</option> 
+ <option value="Schleswig-Holstein">Schleswig-Holstein</option> 
+ <option value="Thuringia">Thuringia</option> 
             </select>
           </div>
         </div>
@@ -1120,27 +1160,24 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="row">
           <div class="form-group col-xs-12">
             <label class="pq-form-label parsley-border" for="contact_form_comments">Comments<span class="parsley-required"> *</span></label>
-            <textarea name="Contact Form Comments" id="contact_form_comments" class="form-control" required></textarea>
+            <textarea name="Contact Form Comments" id="contact_form_comments" class="form-control" required maxlength="4000"></textarea>
           </div>
         </div>
 
         <div class="row">
           <div class="col-xs-12">
             <p class="pq-lead-text">Privacy regulations require that we get your consent to continue to collect, store and use the personal information submitted for account creation or collected while using our services.</p>
-            <div class="form-group">
-              <label class="pq-form-label parsley-border"><span class="parsley-required">*</span>&nbsp;
-              <input type="checkbox" name="Double OptIn" required value="Yes"/>
-              I consent to the collection and use of my personal information consistent with the 
-              <a href="https://www.proquest.com/go/privacy" target="_blank">Privacy Policy</a>. 
-              I&nbsp;acknowledge that use of the service is subject to the 
-              <a href="https://proquest.com/go/termsandconditions" target="_blank">Terms & Conditions</a>.</label>
-            </div>
+            <p class="pq-form-label">
+              <span class="parsley-required">*</span>&nbsp;<input type="checkbox" name="Double OptIn" id="double_optin" required value="Yes"/>
+              I consent to the collection and use of my personal information consistent with the <a href="https://www.proquest.com/go/privacy" target="_blank">Privacy Policy</a>. 
+              I&nbsp;acknowledge that use of the service is subject to the <a href="https://proquest.com/go/termsandconditions" target="_blank">Terms & Conditions</a>.
+            </p>
           </div>
         </div>
 
         <div class="row">
           <div class="form-group col-md-3 col-lg-3">
-            <input type="submit" name="submit" class="btn btn-primary btn-lg" value="Submit" />
+            <input type="submit" name="submit" id="submit" class="btn btn-primary btn-lg" value="Submit" disabled />
           </div>
         </div>
 

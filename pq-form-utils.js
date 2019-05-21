@@ -1,7 +1,7 @@
 /* ########################################  PQ Form Utils  ########################################
 @title   ProQuest Form Utilities
 @author  Jim Saiya
-@date    2019-03-22
+@date    2019-05-17
 
    A $(document).ready() JQuery function must be added to the JavaScript on the form .html page.
 
@@ -39,7 +39,7 @@ function startFormUtils(sfuForm, sfuCountry, sfuStateprov, sfuMarket, sfuSubmark
 
 		// Bind clearIdentity() function to all links that clear the form
 		$('.clear-identity-action').click(function(e) {
-			e.preventDefault();						// don't reload the page
+			e.preventDefault();						// don`t reload the page
 			checkCountryState('init', sfuCountry, sfuStateprov);		// reset the State/Province field if needed
 		});
 
@@ -102,10 +102,12 @@ function initFormIdentityLink(sfuForm, sfuDefaultField, sfuEmail, sfuCountry, sf
 
 	// Show the "Clear the form" prompt
 	$('#clear-identity-prompt').show();
+	// and because Firefox sometimes doesn`t make the prompt appear...
+	$('#clear-identity-prompt').css('display', 'inline-block');
 
 	// Bind clearUserIdentity() function to all links that clear the form
 	$('.clear-identity-action').click(function(e) {
-		e.preventDefault();						// don't reload the page
+		e.preventDefault();						// don`t reload the page
 		clearUserIdentity(sfuForm, sfuEmail);				// clear the form
 		checkJobFunction('init', sfuJobFunc, sfuOtherJobFunc);		// reset the Other Job Function field
 		checkCountryState('init', sfuCountry, sfuStateprov);		// reset the State/Province field if needed
@@ -131,12 +133,13 @@ console.log('Clearing identity...'); ////////////////////////////////
 		$('#'+sfuForm ).clearForm();					// reset the form (from jquery.form.js)
 		$('#'+sfuEmail).prop('disabled', false);			// enable email field
 		$('#'+sfuEmail).prop('required', 'required');			// require an email address
+		$('#submit').prop('disabled', true);				// disable the Submit button since the Double OptIn checkbox is cleared
 	}
 
 }
 
 
-// Function to get today's date for filling out date fields
+// Function to get today`s date for filling out date fields
 function getTodaysDateString() {
   var today = new Date();
   var dd = today.getDate();
@@ -206,7 +209,7 @@ console.log('Selected Submarket:  ', currentSubmarket); ////////////////////////
 
 	if ( selectedMarket.length ) {  // the market was found
 
-		// Build market's submarket dropdown list
+		// Build market`s submarket dropdown list
 		var opt = new Option('', '');
 		$('#'+sfuSubmarket).append(opt);
 		$(selectedMarket[0].submarkets).each(function(index, submarket) {
@@ -251,7 +254,7 @@ console.log('Selected State:      ', currentState); ////////////////////////////
 	if ( selectedCountry.length ) {  // the country was found
 		if ( selectedCountry[0].states.length ) {  // this country has states or provinces
 
-			// Build country's state/province dropdown list
+			// Build country`s state/province dropdown list
 			var opt = new Option('', '');
 			$('#'+sfuStateprov).append(opt);
 			$(selectedCountry[0].states).each(function(index, state) {
