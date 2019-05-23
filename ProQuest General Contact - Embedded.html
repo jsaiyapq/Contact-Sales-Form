@@ -411,8 +411,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <div class="form-group col-ss-6">
             <label class="pq-form-label" for="email">Email<span class="parsley-required"> *</span></label>
             <span class="parsley-error-message  hidden">Email format is not valid</span>
-            <input type="text" name="Email" id="email" class="form-control" data-parsley-type="email" maxlength="60" required
-            data-toggle="tooltip" data-placement="top"
+            <input type="text" name="Email" id="email" class="form-control" maxlength="60" required
+            data-parsley-type="email" data-parsley-trigger="focusout" data-toggle="tooltip" data-placement="top"
             title="For security purposes and protection of customer data, you will not be able to change your email address once the form has been submitted." />
           </div>
           <div class="form-group col-ss-6">
@@ -1157,13 +1157,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="row">
           <div class="form-group col-xs-12">
             <label class="pq-form-label parsley-border" for="contact_form_comments">Comments<span class="parsley-required"> *</span></label>
-            <textarea name="Contact Form Comments" id="contact_form_comments" class="form-control" required maxlength="4000"></textarea>
+            <textarea name="Contact Form Comments" id="contact_form_comments" class="form-control" maxlength="4000" required></textarea>
           </div>
         </div>
 
         <div class="row">
           <div class="col-xs-12">
-            <p class="pq-lead-text">Privacy regulations require that we get your consent to continue to collect, store and use the personal information submitted for account creation or collected while using our services.</p>
+            <p class="pq-form-label">Privacy regulations require that we get your consent to continue to collect, store and use the personal information submitted for account creation or collected while using our services.</p>
             <p class="pq-form-label">
               <span class="parsley-required">*</span>&nbsp;<input type="checkbox" name="Double OptIn" id="double_optin" required value="Yes"/>
               I consent to the collection and use of my personal information consistent with the <a href="https://www.proquest.com/go/privacy" target="_blank">Privacy Policy</a>. 
