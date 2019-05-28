@@ -1,7 +1,7 @@
 /* ########################################  PQ Form Utils  ########################################
 @title   ProQuest Form Utilities
 @author  Jim Saiya
-@date    2019-05-20
+@date    2019-05-28
 
    A $(document).ready() JQuery function must be added to the JavaScript on the form .html page.
 
@@ -605,8 +605,8 @@ var countryStateList = [
 	{name: 'Cher', code: 'Cher'},
 	{name: 'Corrèze', code: 'Corrèze'},
 	{name: 'Corse-du-Sud', code: 'Corse-du-Sud'},
-	{name: 'Cote d\'Or', code: 'Cote d\'Or'},
-	{name: 'Cotes-d\'Armor', code: 'Cotes-d\'Armor'},
+	{name: 'Côte-d\'Or', code: 'Côte-d\'Or'},
+	{name: 'Côtes-d\'Armor', code: 'Côtes-d\'Armor'},
 	{name: 'Creuse', code: 'Creuse'},
 	{name: 'Deux-Sèvres', code: 'Deux-Sèvres'},
 	{name: 'Dordogne', code: 'Dordogne'},
@@ -614,7 +614,7 @@ var countryStateList = [
 	{name: 'Drôme', code: 'Drôme'},
 	{name: 'Essonne', code: 'Essonne'},
 	{name: 'Eure', code: 'Eure'},
-	{name: 'Eure-et-loir', code: 'Eure-et-loir'},
+	{name: 'Eure-et-Loir', code: 'Eure-et-Loir'},
 	{name: 'Finistère', code: 'Finistère'},
 	{name: 'Gard', code: 'Gard'},
 	{name: 'Gers', code: 'Gers'},

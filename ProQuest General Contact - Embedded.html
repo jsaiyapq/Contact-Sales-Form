@@ -103,8 +103,48 @@ form#pq-contact .tooltip-arrow { /* id needed here for specificity */
 <script src="https://cdnjs.cloudflare.com/ajax/libs/parsley.js/2.7.2/parsley.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.2.1/jquery.form.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
-<!--<script src="https://www.proquest.com/includes/pq-form-utils.js?cacheBuster=1"></script>-->  <!-- For Production -->
-<script src="https://stage.www.proquest.com/includes/pq-form-utils.js?cacheBuster=1"></script>  <!-- //////////////// FOR TESTING //////////////// -->
+<script id="cache-buster">
+/*
+ * Cache Buster
+ * Keeps Clickability from caching pq-form-utils.js (forces loading the latest code changes from the server)
+ */
+
+// Create a new <script> element in the DOM
+var thisScript = document.getElementById('cache-buster');
+var newScript = document.createElement('script');
+var triggerValue;
+switch ('testing') {  // change this value manually
+  case 'testing':
+    triggerValue = Math.random();  // force load on each page refresh
+    newScript.src = 'https://stage.www.proquest.com/includes/pq-form-utils.js?cacheBuster='+triggerValue;
+    break;
+  case 'production':
+    let today = new Date();
+    triggerValue = today.toDateString();  // force load at least once a day
+    newScript.src = 'https://www.proquest.com/includes/pq-form-utils.js?cacheBuster='+triggerValue;
+    break;
+  default:
+    console.error('Not using "testing" or "production" in Cache Buster switch statement');
+}
+thisScript.parentNode.insertBefore(newScript, thisScript);  // put new script before this script (immediate execution)
+
+/* Call all PQ Form Utils functions from this function to guarantee the script has loaded first */
+function initFormUtilsOnLoad() {
+  if( typeof initFormUtils === 'undefined' ) {
+    console.log('Script not loaded...'); ////////////////
+    setTimeout(function() {
+      initFormUtilsOnLoad();
+    }, 200)
+  } else {
+    console.log('Script loaded.'); ////////////////
+    // execute pq-form-utils.js functions
+    initFormUtils('pq-contact', 'first_name', 'email', 'country', 'state_province', 'market', 'submarket', 'job_function', 'job_function_other');
+    let dateString = getTodaysDateString();
+    $('#LastTouchLeadSourceDate').val(dateString);
+    $('#DoubleOptInDate').val(dateString);
+  }
+}
+</script>
 <script>
 /*
  * Document Ready function
@@ -116,14 +156,16 @@ $( document ).ready(function() {
   // set up Parsley
   var parsleyForm = $('#pq-contact').parsley({ errorsMessagesDisabled: true });  // we handle display of error messages
 
-  // display/hide validation error messages near the fields
+  // display/hide validation error message(s) near the field(s)
   $('#pq-contact').parsley().on('field:validated', function() {
-    if (this.validationResult === true) {
+    console.log(this.validationResult); ////////////////
+    if ( this.validationResult === true ) {  //no errors
       this.$element.prevAll('.parsley-error-message').addClass('hidden');
     } else {
+    //if ( this.validationResult[0].assert.name === 'type' && this.validationResult[0].assert.requirements === 'email' ) {  // using Parsley -- not confirmed
       if ( this.element.value != '' ) {  // currently the only error message we display is `Email format is not valid`
         this.$element.prev('.parsley-error-message').removeClass('hidden');
-      } else {  // no message for missing value
+      } else {  // no message for missing value error
         this.$element.prevAll('.parsley-error-message').addClass('hidden');
       }
     }
@@ -131,9 +173,6 @@ $( document ).ready(function() {
 
   // enable Bootstrap tooltip for email field
   $('[data-toggle="tooltip"]').tooltip();
-
-  // from pq-form-utils.js
-  initFormUtils('pq-contact', 'first_name', 'email', 'country', 'state_province', 'market', 'submarket', 'job_function', 'job_function_other');
 
   // if the email field has been locked, display a warning and a way to clear the form
   if ( $('[name="RECIPIENT_ID_*"]').length && $('#email').val().length ) {
@@ -170,17 +209,16 @@ $( document ).ready(function() {
     }
   });
 
-  // set values for hidden fields that could have been overwritten by auto-populate on the server
+  // initialize dependent drop-downs, enable form clearing if data already exists, etc.
+  initFormUtilsOnLoad();
+
+  // force these values for both new and existing users who submit this form
+  // (we need to set them here instead of in HTML because Watson will overwrite the defaults for existing users)
   $('#LeadStatus').val('Sales Ready');
   $('#SalesReadyType').val('Direct Inquiries');
   $('#LastTouchLeadSource').val('Web-Direct Inquiry');
 
-  // set hidden fields to current date
-  var dateString = getTodaysDateString();
-  $('#LastTouchLeadSourceDate').val(dateString);
-  $('#DoubleOptInDate').val(dateString);
-
-  console.log('End Doc Ready.'); ////////////////
+  console.log('End Doc Ready.\n\n'); ////////////////
 
 });
 </script>
@@ -681,6 +719,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <label class="pq-form-label" for="state_province">State/Province</label>
             <select name="State_Province" id="state_province" class="form-control">
               <option selected=""></option>
+              <!-- Australia (AU) -->
               <option value="ACT">Australian Capital Territory</option>
               <option value="NSW">New South Wales</option>
               <option value="NT">Northern Territory</option>
@@ -689,6 +728,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               <option value="TAS">Tasmania</option>
               <option value="VIC">Victoria</option>
               <option value="WA">Western Australia</option>
+              <!-- Brazil (BR) -->
               <option value="AC">Acre</option>
               <option value="AL">Alagoas</option>
               <option value="AP">Amapá</option>
@@ -716,6 +756,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               <option value="SP">São Paulo</option>
               <option value="SE">Sergipe</option>
               <option value="TO">Tocantins</option>
+              <!-- Canada (CA) -->
               <option value="AB">Alberta</option>
               <option value="BC">British Columbia</option>
               <option value="MB">Manitoba</option>
@@ -729,6 +770,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               <option value="QC">Quebec</option>
               <option value="SK">Saskatchewan</option>
               <option value="YT">Yukon</option>
+              <!-- China (CN) -->
               <option value="AH">Anhui Province</option>
               <option value="BJ">Beijing Municipality</option>
               <option value="CQ">Chongqing Municipality</option>
@@ -763,121 +805,124 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               <option value="XJ">Xinjiang Uyghur Autonomous Region</option>
               <option value="YN">Yunnan Province</option>
               <option value="ZJ">Zhejiang Province</option>
-              <option value="Ain">Ain</option> 
-              <option value="Aisne">Aisne</option> 
-              <option value="Allier">Allier</option> 
-              <option value="Alpes-de-Haute-Provence">Alpes-de-Haute-Provence</option> 
-              <option value="Alpes-Maritimes">Alpes-Maritimes</option> 
-              <option value="Ardèche">Ardèche</option> 
-              <option value="Ardennes">Ardennes</option> 
-              <option value="Ariège">Ariège</option> 
-              <option value="Aube">Aube</option> 
-              <option value="Aude">Aude</option> 
-              <option value="Aveyron">Aveyron</option> 
-              <option value="Bas-Rhin">Bas-Rhin</option> 
-              <option value="Bouches-du-Rhône">Bouches-du-Rhône</option> 
-              <option value="Calvados">Calvados</option> 
-              <option value="Cantal">Cantal</option> 
-              <option value="Charente">Charente</option> 
-              <option value="Charente-Maritime">Charente-Maritime</option> 
-              <option value="Cher">Cher</option> 
-              <option value="Corrèze">Corrèze</option> 
-              <option value="Corse-du-Sud">Corse-du-Sud</option> 
-              <option value="Cote d'Or">Cote d'Or</option> 
-              <option value="Cotes-d'Armor">Cotes-d'Armor</option> 
-              <option value="Creuse">Creuse</option> 
-              <option value="Deux-Sèvres">Deux-Sèvres</option> 
-              <option value="Dordogne">Dordogne</option> 
-              <option value="Doubs">Doubs</option> 
-              <option value="Drôme">Drôme</option> 
-              <option value="Essonne">Essonne</option> 
-              <option value="Eure">Eure</option> 
-              <option value="Eure-et-loir">Eure-et-loir</option> 
-              <option value="Finistère">Finistère</option> 
-              <option value="Gard">Gard</option> 
-              <option value="Gers">Gers</option> 
-              <option value="Gironde">Gironde</option> 
-              <option value="Guadeloupe">Guadeloupe</option> 
-              <option value="Guyane">Guyane</option> 
-              <option value="Haute-Corse ">Haute-Corse </option> 
-              <option value="Haute-Garonne">Haute-Garonne</option> 
-              <option value="Haute-Loire">Haute-Loire</option> 
-              <option value="Haute-Marne">Haute-Marne</option> 
-              <option value="Hautes-Alpes">Hautes-Alpes</option> 
-              <option value="Haute-Saône">Haute-Saône</option> 
-              <option value="Haute-Savoie">Haute-Savoie</option> 
-              <option value="Hautes-Pyrénées">Hautes-Pyrénées</option> 
-              <option value="Haute-Vienne">Haute-Vienne</option> 
-              <option value="Haut-Rhin">Haut-Rhin</option> 
-              <option value="Hauts-de-Seine">Hauts-de-Seine</option> 
-              <option value="Hérault">Hérault</option> 
-              <option value="Ille-et-Vilaine">Ille-et-Vilaine</option> 
-              <option value="Indre">Indre</option> 
-              <option value="Indre-et-Loire">Indre-et-Loire</option> 
-              <option value="Isère"> Isère</option> 
-              <option value="Jura">Jura</option> 
-              <option value="Landes">Landes</option> 
-              <option value="Loire">Loire</option> 
-              <option value="Loire-Atlantique">Loire-Atlantique</option> 
-              <option value="Loiret">Loiret</option> 
-              <option value="Loir-et-Cher">Loir-et-Cher</option> 
-              <option value="Lot">Lot</option> 
-              <option value="Lot-et-Garonne">Lot-et-Garonne</option> 
-              <option value="Lozère">Lozère</option> 
-              <option value="Maine-et-Loire">Maine-et-Loire</option> 
-              <option value="Manche">Manche</option> 
-              <option value="Marne">Marne</option> 
-              <option value="Martinique">Martinique</option> 
-              <option value="Mayenne">Mayenne</option> 
-              <option value="Meurthe-et-Moselle">Meurthe-et-Moselle</option> 
-              <option value="Meuse">Meuse</option> 
-              <option value="Morbihan">Morbihan</option> 
-              <option value="Moselle">Moselle</option> 
-              <option value="Nièvre">Nièvre</option> 
-              <option value="Nord">Nord</option> 
-              <option value="Oise">Oise</option> 
-              <option value="Orne">Orne</option> 
-              <option value="Paris">Paris</option> 
-              <option value="Pas-de-Calais">Pas-de-Calais</option> 
-              <option value="Puy-de-Dôme">Puy-de-Dôme</option> 
-              <option value="Pyrénées-Atlantiques">Pyrénées-Atlantiques</option> 
-              <option value="Pyrénées-Orientales">Pyrénées-Orientales</option> 
-              <option value="Rhône">Rhône</option> 
-              <option value="Saône-et-Loire=">Saône-et-Loire</option>
-              <option value="Sarthe">Sarthe</option> 
-              <option value="Savoie">Savoie</option> 
-              <option value="Seine-et-Marne">Seine-et-Marne</option> 
-              <option value="Seine-Maritime">Seine-Maritime</option> 
-              <option value="Seine-Saint-Denis">Seine-Saint-Denis</option> 
-              <option value="Somme">Somme</option> 
-              <option value="Tarn">Tarn</option> 
-              <option value="Tarn-et-Garonne">Tarn-et-Garonne</option> 
-              <option value="Territoire de Belfort">Territoire de Belfort</option> 
-              <option value="Val-de-Marne">Val-de-Marne</option> 
-              <option value="Val-d'Oise">Val-d'Oise</option> 
-              <option value="Var">Var</option> 
-              <option value="Vaucluse">Vaucluse</option> 
-              <option value="Vendée">Vendée</option> 
-              <option value="Vienne">Vienne</option> 
-              <option value="Vosges">Vosges</option> 
-              <option value="Yonne">Yonne</option> 
-              <option value="Yvelines">Yvelines</option> 
-              <option value="Baden-Württemberg">Baden-Württemberg</option> 
-              <option value="Bavaria">Bavaria</option> 
-              <option value="Berlin">Berlin</option> 
-              <option value="Brandenburg">Brandenburg</option> 
-              <option value="Bremen">Bremen</option> 
-              <option value="Hamburg">Hamburg</option> 
-              <option value="Hessen">Hessen</option> 
-              <option value="Lower Saxony">Lower Saxony</option> 
-              <option value="Mecklenburg-Western Pomerania">Mecklenburg-Western Pomerania</option> 
-              <option value="North Rhine-Westphalia">North Rhine-Westphalia</option> 
-              <option value="Rhineland-Palatinate">Rhineland-Palatinate</option> 
-              <option value="Saarland">Saarland</option> 
-              <option value="Saxony">Saxony</option> 
-              <option value="Saxony-Anhalt">Saxony-Anhalt</option> 
-              <option value="Schleswig-Holstein">Schleswig-Holstein</option> 
-              <option value="Thuringia">Thuringia</option> 
+              <!-- France (FR) -->
+              <option value="Ain">Ain</option>
+              <option value="Aisne">Aisne</option>
+              <option value="Allier">Allier</option>
+              <option value="Alpes-de-Haute-Provence">Alpes-de-Haute-Provence</option>
+              <option value="Alpes-Maritimes">Alpes-Maritimes</option>
+              <option value="Ardèche">Ardèche</option>
+              <option value="Ardennes">Ardennes</option>
+              <option value="Ariège">Ariège</option>
+              <option value="Aube">Aube</option>
+              <option value="Aude">Aude</option>
+              <option value="Aveyron">Aveyron</option>
+              <option value="Bas-Rhin">Bas-Rhin</option>
+              <option value="Bouches-du-Rhône">Bouches-du-Rhône</option>
+              <option value="Calvados">Calvados</option>
+              <option value="Cantal">Cantal</option>
+              <option value="Charente">Charente</option>
+              <option value="Charente-Maritime">Charente-Maritime</option>
+              <option value="Cher">Cher</option>
+              <option value="Corrèze">Corrèze</option>
+              <option value="Corse-du-Sud">Corse-du-Sud</option>
+              <option value="Côte-d'Or">Côte-d'Or</option>
+              <option value="Côtes-d'Armor">Côtes-d'Armor</option>
+              <option value="Creuse">Creuse</option>
+              <option value="Deux-Sèvres">Deux-Sèvres</option>
+              <option value="Dordogne">Dordogne</option>
+              <option value="Doubs">Doubs</option>
+              <option value="Drôme">Drôme</option>
+              <option value="Essonne">Essonne</option>
+              <option value="Eure">Eure</option>
+              <option value="Eure-et-Loir">Eure-et-Loir</option>
+              <option value="Finistère">Finistère</option>
+              <option value="Gard">Gard</option>
+              <option value="Gers">Gers</option>
+              <option value="Gironde">Gironde</option>
+              <option value="Guadeloupe">Guadeloupe</option>
+              <option value="Guyane">Guyane</option>
+              <option value="Haute-Corse ">Haute-Corse</option>
+              <option value="Haute-Garonne">Haute-Garonne</option>
+              <option value="Haute-Loire">Haute-Loire</option>
+              <option value="Haute-Marne">Haute-Marne</option>
+              <option value="Hautes-Alpes">Hautes-Alpes</option>
+              <option value="Haute-Saône">Haute-Saône</option>
+              <option value="Haute-Savoie">Haute-Savoie</option>
+              <option value="Hautes-Pyrénées">Hautes-Pyrénées</option>
+              <option value="Haute-Vienne">Haute-Vienne</option>
+              <option value="Haut-Rhin">Haut-Rhin</option>
+              <option value="Hauts-de-Seine">Hauts-de-Seine</option>
+              <option value="Hérault">Hérault</option>
+              <option value="Ille-et-Vilaine">Ille-et-Vilaine</option>
+              <option value="Indre">Indre</option>
+              <option value="Indre-et-Loire">Indre-et-Loire</option>
+              <option value="Isère">Isère</option>
+              <option value="Jura">Jura</option>
+              <option value="Landes">Landes</option>
+              <option value="Loire">Loire</option>
+              <option value="Loire-Atlantique">Loire-Atlantique</option>
+              <option value="Loiret">Loiret</option>
+              <option value="Loir-et-Cher">Loir-et-Cher</option>
+              <option value="Lot">Lot</option>
+              <option value="Lot-et-Garonne">Lot-et-Garonne</option>
+              <option value="Lozère">Lozère</option>
+              <option value="Maine-et-Loire">Maine-et-Loire</option>
+              <option value="Manche">Manche</option>
+              <option value="Marne">Marne</option>
+              <option value="Martinique">Martinique</option>
+              <option value="Mayenne">Mayenne</option>
+              <option value="Meurthe-et-Moselle">Meurthe-et-Moselle</option>
+              <option value="Meuse">Meuse</option>
+              <option value="Morbihan">Morbihan</option>
+              <option value="Moselle">Moselle</option>
+              <option value="Nièvre">Nièvre</option>
+              <option value="Nord">Nord</option>
+              <option value="Oise">Oise</option>
+              <option value="Orne">Orne</option>
+              <option value="Paris">Paris</option>
+              <option value="Pas-de-Calais">Pas-de-Calais</option>
+              <option value="Puy-de-Dôme">Puy-de-Dôme</option>
+              <option value="Pyrénées-Atlantiques">Pyrénées-Atlantiques</option>
+              <option value="Pyrénées-Orientales">Pyrénées-Orientales</option>
+              <option value="Rhône">Rhône</option>
+              <option value="Saône-et-Loire">Saône-et-Loire</option>
+              <option value="Sarthe">Sarthe</option>
+              <option value="Savoie">Savoie</option>
+              <option value="Seine-et-Marne">Seine-et-Marne</option>
+              <option value="Seine-Maritime">Seine-Maritime</option>
+              <option value="Seine-Saint-Denis">Seine-Saint-Denis</option>
+              <option value="Somme">Somme</option>
+              <option value="Tarn">Tarn</option>
+              <option value="Tarn-et-Garonne">Tarn-et-Garonne</option>
+              <option value="Territoire de Belfort">Territoire de Belfort</option>
+              <option value="Val-de-Marne">Val-de-Marne</option>
+              <option value="Val-d'Oise">Val-d'Oise</option>
+              <option value="Var">Var</option>
+              <option value="Vaucluse">Vaucluse</option>
+              <option value="Vendée">Vendée</option>
+              <option value="Vienne">Vienne</option>
+              <option value="Vosges">Vosges</option>
+              <option value="Yonne">Yonne</option>
+              <option value="Yvelines">Yvelines</option>
+              <!-- Germany (DE) -->
+              <option value="Baden-Württemberg">Baden-Württemberg</option>
+              <option value="Bavaria">Bavaria</option>
+              <option value="Berlin">Berlin</option>
+              <option value="Brandenburg">Brandenburg</option>
+              <option value="Bremen">Bremen</option>
+              <option value="Hamburg">Hamburg</option>
+              <option value="Hessen">Hessen</option>
+              <option value="Lower Saxony">Lower Saxony</option>
+              <option value="Mecklenburg-Western Pomerania">Mecklenburg-Western Pomerania</option>
+              <option value="North Rhine-Westphalia">North Rhine-Westphalia</option>
+              <option value="Rhineland-Palatinate">Rhineland-Palatinate</option>
+              <option value="Saarland">Saarland</option>
+              <option value="Saxony">Saxony</option>
+              <option value="Saxony-Anhalt">Saxony-Anhalt</option>
+              <option value="Schleswig-Holstein">Schleswig-Holstein</option>
+              <option value="Thuringia">Thuringia</option>
+              <!-- India (IN) -->
               <option value="AN">Andaman and Nicobar Islands</option>
               <option value="AP">Andhra Pradesh</option>
               <option value="AR">Arunachal Pradesh</option>
@@ -914,188 +959,192 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               <option value="UP">Uttar Pradesh</option>
               <option value="UT">Uttarakhand</option>
               <option value="WB">West Bengal</option>
-              <option value="Aichi-ken">Aichi-ken</option> 
-              <option value="Akita-ken">Akita-ken</option> 
-              <option value="Aomori-ken">Aomori-ken</option> 
-              <option value="Chiba-ken">Chiba-ken</option> 
-              <option value="Ehime-ken">Ehime-ken</option> 
-              <option value="Fukui-ken">Fukui-ken</option> 
-              <option value="Fukuoka-ken">Fukuoka-ken</option> 
-              <option value="Fukushima">Fukushima</option> 
-              <option value="Gifu-ken">Gifu-ken</option> 
-              <option value="Gunma-ken">Gunma-ken</option> 
-              <option value="Hiroshima">Hiroshima</option> 
-              <option value="Hokkaidō">Hokkaidō</option> 
-              <option value="Hyogo-ken">Hyogo-ken</option> 
-              <option value="Ibaraki-ken">Ibaraki-ken</option> 
-              <option value="Ishikawa">Ishikawa</option> 
-              <option value="Iwate-ken">Iwate-ken</option> 
-              <option value="Kagawa-ken">Kagawa-ken</option> 
-              <option value="Kagoshima">Kagoshima</option> 
-              <option value="Kanagawa">Kanagawa</option> 
-              <option value="Kochi-ken">Kochi-ken</option> 
-              <option value="Kumamoto">Kumamoto</option> 
-              <option value="Kyoto-fu">Kyoto-fu</option> 
-              <option value="Mie-ken">Mie-ken</option> 
-              <option value="Miyagi-ken">Miyagi-ken</option> 
-              <option value="Miyazaki">Miyazaki</option> 
-              <option value="Nagano-ken">Nagano-ken</option> 
-              <option value="Nagasaki">Nagasaki</option> 
-              <option value="Nara-ken">Nara-ken</option> 
-              <option value="Niigata-ken">Niigata-ken</option> 
-              <option value="Oita-ken">Oita-ken</option> 
-              <option value="Okayama-ken">Okayama-ken</option> 
-              <option value="Okinawa-ken">Okinawa-ken</option> 
-              <option value="Osaka-fu">Osaka-fu</option> 
-              <option value="Saga-ken">Saga-ken</option> 
-              <option value="Saitama-ken">Saitama-ken</option> 
-              <option value="Shiga-ken">Shiga-ken</option> 
-              <option value="Shimane-ken">Shimane-ken</option> 
-              <option value="Shizuoka-ken">Shizuoka-ken</option> 
-              <option value="Tochigi-ken">Tochigi-ken</option> 
-              <option value="Tokushima-ken">Tokushima-ken</option> 
-              <option value="Tokyo-to">Tokyo-to</option> 
-              <option value="Tottori-ken">Tottori-ken</option> 
-              <option value="Toyama-ken">Toyama-ken</option> 
-              <option value="Wakayama-ken">Wakayama-ken</option> 
-              <option value="Yamagata-ken">Yamagata-ken</option> 
-              <option value="Yamaguchi-ken">Yamaguchi-ken</option> 
-              <option value="Yamanashi-ken">Yamanashi-ken</option> 
-              <option value="A Coruña">A Coruña</option> 
-              <option value="Álava">Álava</option> 
-              <option value="Albacete">Albacete</option> 
-              <option value="Alicante">Alicante</option> 
-              <option value="Almería">Almería</option> 
-              <option value="Asturias">Asturias</option> 
-              <option value="Ávila">Ávila</option> 
-              <option value="Badajoz">Badajoz</option> 
-              <option value="Balearic Islands">Balearic Islands</option> 
-              <option value="Barcelona">Barcelona</option> 
-              <option value="Biscay">Biscay</option> 
-              <option value="Burgos">Burgos</option> 
-              <option value="Cáceres">Cáceres</option> 
-              <option value="Cádiz">Cádiz</option> 
-              <option value="Cantabria">Cantabria</option> 
-              <option value="Castellón">Castellón</option> 
-              <option value="Ceuta">Ceuta</option> 
-              <option value="Ciudad Real">Ciudad Real</option> 
-              <option value="Córdoba">Córdoba</option> 
-              <option value="Cuenca">Cuenca</option> 
-              <option value="Girona">Girona</option> 
-              <option value="Granada">Granada</option> 
-              <option value="Guadalajara">Guadalajara</option> 
-              <option value="Guipúzcoa">Guipúzcoa</option> 
-              <option value="Huelva">Huelva</option> 
-              <option value="Huesca">Huesca</option> 
-              <option value="Jaén">Jaén</option> 
-              <option value="La Rioja">La Rioja</option> 
-              <option value="Las Palmas">Las Palmas</option> 
-              <option value="León">León</option> 
-              <option value="Lérida">Lérida</option> 
-              <option value="Lleida">Lleida</option> 
-              <option value="Lugo">Lugo</option> 
-              <option value="Madrid">Madrid</option> 
-              <option value="Málaga">Málaga</option> 
-              <option value="Melilla">Melilla</option> 
-              <option value="Murcia">Murcia</option> 
-              <option value="Navarra">Navarra</option> 
-              <option value="Ourense">Ourense</option> 
-              <option value="Palencia">Palencia</option> 
-              <option value="Pontevedra">Pontevedra</option> 
-              <option value="Salamanca">Salamanca</option> 
-              <option value="Santa Cruz De Tenerife">Santa Cruz De Tenerife</option> 
-              <option value="Segovia">Segovia</option> 
-              <option value="Sevilla">Sevilla</option> 
-              <option value="Soria">Soria</option> 
-              <option value="Tarragona">Tarragona</option> 
-              <option value="Teruel">Teruel</option> 
-              <option value="Toledo">Toledo</option> 
-              <option value="València">València</option> 
-              <option value="Valladolid">Valladolid</option> 
-              <option value="Vizcaya">Vizcaya</option> 
-              <option value="Zamora">Zamora</option> 
-              <option value="Zaragoza">Zaragoza</option> 
-              <option value="Adana">Adana</option> 
-              <option value="Adiyaman">Adiyaman</option> 
-              <option value="Afyonkarahisar">Afyonkarahisar</option> 
-              <option value="Ağrı">Ağrı</option> 
-              <option value="Aksaray">Aksaray</option> 
-              <option value="Amasya">Amasya</option> 
-              <option value="Ankara">Ankara</option> 
-              <option value="Antalya">Antalya</option> 
-              <option value="Ardahan">Ardahan</option> 
-              <option value="Artvin">Artvin</option> 
-              <option value="Aydin">Aydin</option> 
-              <option value="Balıkesir">Balıkesir</option> 
-              <option value="Bartın">Bartın</option> 
-              <option value="Batman">Batman</option> 
-              <option value="Bayburt">Bayburt</option> 
-              <option value="Bilecik">Bilecik</option> 
-              <option value="Bingöl ">Bingöl </option> 
-              <option value="Bitlis">Bitlis</option> 
-              <option value="Bolu">Bolu</option> 
-              <option value="Burdur">Burdur</option> 
-              <option value="Bursa">Bursa</option> 
-              <option value="Çanakkale">Çanakkale</option> 
-              <option value="Çankırı">Çankırı</option> 
-              <option value="Çorum">Çorum</option> 
-              <option value="Denizli">Denizli</option> 
-              <option value="Diyarbakir">Diyarbakir</option> 
-              <option value="Düzce">Düzce</option> 
-              <option value="Edirne">Edirne</option> 
-              <option value="Elazığ">Elazığ</option> 
-              <option value="Erzincan">Erzincan</option> 
-              <option value="Erzurum">Erzurum</option> 
-              <option value="Eskişehir">Eskişehir</option> 
-              <option value="Gaziantep">Gaziantep</option> 
-              <option value="Giresun">Giresun</option> 
-              <option value="Gümüşhane">Gümüşhane</option> 
-              <option value="Hakkâri">Hakkâri</option> 
-              <option value="Hatay">Hatay</option> 
-              <option value="Iğdır">Iğdır</option> 
-              <option value="Isparta">Isparta</option> 
-              <option value="Istanbul">Istanbul</option> 
-              <option value="Izmir">Izmir</option> 
-              <option value="Kahramanmaraş">Kahramanmaraş</option> 
-              <option value="Karabük">Karabük</option> 
-              <option value="Karaman">Karaman</option> 
-              <option value="Kars">Kars</option> 
-              <option value="Kastamonu">Kastamonu</option> 
-              <option value="Kayseri">Kayseri</option> 
-              <option value="Kilis">Kilis</option> 
-              <option value="Kirikkale">Kirikkale</option> 
-              <option value="Kirklareli">Kirklareli</option> 
-              <option value="Kırşehir">Kırşehir</option> 
-              <option value="Kocaeli">Kocaeli</option> 
-              <option value="Konya">Konya</option> 
-              <option value="Kütahya">Kütahya</option> 
-              <option value="Malatya">Malatya</option> 
-              <option value="Manisa">Manisa</option> 
-              <option value="Mardin">Mardin</option> 
-              <option value="Mersin">Mersin</option> 
-              <option value="Muğla">Muğla</option> 
-              <option value="Muş">Muş</option> 
-              <option value="Nevşehir">Nevşehir</option> 
-              <option value="Niğde">Niğde</option> 
-              <option value="Ordu">Ordu</option> 
-              <option value="Osmaniye">Osmaniye</option> 
-              <option value="Rize">Rize</option> 
-              <option value="Sakarya">Sakarya</option> 
-              <option value="Samsun">Samsun</option> 
-              <option value="Sanliurfa">Sanliurfa</option> 
-              <option value="Siirt">Siirt</option> 
-              <option value="Sinop">Sinop</option> 
-              <option value="Şırnak">Şırnak</option> 
-              <option value="Sivas">Sivas</option> 
-              <option value="Tekirdağ">Tekirdağ</option> 
-              <option value="Tokat">Tokat</option> 
-              <option value="Trabzon">Trabzon</option> 
-              <option value="Tunceli">Tunceli</option> 
-              <option value="Uşak">Uşak</option> 
-              <option value="Van">Van</option> 
-              <option value="Yalova">Yalova</option> 
-              <option value="Yozgat">Yozgat</option> 
-              <option value="Zonguldak">Zonguldak</option> 
+              <!-- Japan (JP) -->
+              <option value="Aichi-ken">Aichi-ken</option>
+              <option value="Akita-ken">Akita-ken</option>
+              <option value="Aomori-ken">Aomori-ken</option>
+              <option value="Chiba-ken">Chiba-ken</option>
+              <option value="Ehime-ken">Ehime-ken</option>
+              <option value="Fukui-ken">Fukui-ken</option>
+              <option value="Fukuoka-ken">Fukuoka-ken</option>
+              <option value="Fukushima">Fukushima</option>
+              <option value="Gifu-ken">Gifu-ken</option>
+              <option value="Gunma-ken">Gunma-ken</option>
+              <option value="Hiroshima">Hiroshima</option>
+              <option value="Hokkaidō">Hokkaidō</option>
+              <option value="Hyogo-ken">Hyogo-ken</option>
+              <option value="Ibaraki-ken">Ibaraki-ken</option>
+              <option value="Ishikawa">Ishikawa</option>
+              <option value="Iwate-ken">Iwate-ken</option>
+              <option value="Kagawa-ken">Kagawa-ken</option>
+              <option value="Kagoshima">Kagoshima</option>
+              <option value="Kanagawa">Kanagawa</option>
+              <option value="Kochi-ken">Kochi-ken</option>
+              <option value="Kumamoto">Kumamoto</option>
+              <option value="Kyoto-fu">Kyoto-fu</option>
+              <option value="Mie-ken">Mie-ken</option>
+              <option value="Miyagi-ken">Miyagi-ken</option>
+              <option value="Miyazaki">Miyazaki</option>
+              <option value="Nagano-ken">Nagano-ken</option>
+              <option value="Nagasaki">Nagasaki</option>
+              <option value="Nara-ken">Nara-ken</option>
+              <option value="Niigata-ken">Niigata-ken</option>
+              <option value="Oita-ken">Oita-ken</option>
+              <option value="Okayama-ken">Okayama-ken</option>
+              <option value="Okinawa-ken">Okinawa-ken</option>
+              <option value="Osaka-fu">Osaka-fu</option>
+              <option value="Saga-ken">Saga-ken</option>
+              <option value="Saitama-ken">Saitama-ken</option>
+              <option value="Shiga-ken">Shiga-ken</option>
+              <option value="Shimane-ken">Shimane-ken</option>
+              <option value="Shizuoka-ken">Shizuoka-ken</option>
+              <option value="Tochigi-ken">Tochigi-ken</option>
+              <option value="Tokushima-ken">Tokushima-ken</option>
+              <option value="Tokyo-to">Tokyo-to</option>
+              <option value="Tottori-ken">Tottori-ken</option>
+              <option value="Toyama-ken">Toyama-ken</option>
+              <option value="Wakayama-ken">Wakayama-ken</option>
+              <option value="Yamagata-ken">Yamagata-ken</option>
+              <option value="Yamaguchi-ken">Yamaguchi-ken</option>
+              <option value="Yamanashi-ken">Yamanashi-ken</option>
+              <!-- Spain (ES) -->
+              <option value="A Coruña">A Coruña</option>
+              <option value="Álava">Álava</option>
+              <option value="Albacete">Albacete</option>
+              <option value="Alicante">Alicante</option>
+              <option value="Almería">Almería</option>
+              <option value="Asturias">Asturias</option>
+              <option value="Ávila">Ávila</option>
+              <option value="Badajoz">Badajoz</option>
+              <option value="Balearic Islands">Balearic Islands</option>
+              <option value="Barcelona">Barcelona</option>
+              <option value="Biscay">Biscay</option>
+              <option value="Burgos">Burgos</option>
+              <option value="Cáceres">Cáceres</option>
+              <option value="Cádiz">Cádiz</option>
+              <option value="Cantabria">Cantabria</option>
+              <option value="Castellón">Castellón</option>
+              <option value="Ceuta">Ceuta</option>
+              <option value="Ciudad Real">Ciudad Real</option>
+              <option value="Córdoba">Córdoba</option>
+              <option value="Cuenca">Cuenca</option>
+              <option value="Girona">Girona</option>
+              <option value="Granada">Granada</option>
+              <option value="Guadalajara">Guadalajara</option>
+              <option value="Guipúzcoa">Guipúzcoa</option>
+              <option value="Huelva">Huelva</option>
+              <option value="Huesca">Huesca</option>
+              <option value="Jaén">Jaén</option>
+              <option value="La Rioja">La Rioja</option>
+              <option value="Las Palmas">Las Palmas</option>
+              <option value="León">León</option>
+              <option value="Lérida">Lérida</option>
+              <option value="Lleida">Lleida</option>
+              <option value="Lugo">Lugo</option>
+              <option value="Madrid">Madrid</option>
+              <option value="Málaga">Málaga</option>
+              <option value="Melilla">Melilla</option>
+              <option value="Murcia">Murcia</option>
+              <option value="Navarra">Navarra</option>
+              <option value="Ourense">Ourense</option>
+              <option value="Palencia">Palencia</option>
+              <option value="Pontevedra">Pontevedra</option>
+              <option value="Salamanca">Salamanca</option>
+              <option value="Santa Cruz De Tenerife">Santa Cruz De Tenerife</option>
+              <option value="Segovia">Segovia</option>
+              <option value="Sevilla">Sevilla</option>
+              <option value="Soria">Soria</option>
+              <option value="Tarragona">Tarragona</option>
+              <option value="Teruel">Teruel</option>
+              <option value="Toledo">Toledo</option>
+              <option value="València">València</option>
+              <option value="Valladolid">Valladolid</option>
+              <option value="Vizcaya">Vizcaya</option>
+              <option value="Zamora">Zamora</option>
+              <option value="Zaragoza">Zaragoza</option>
+              <!-- Turkey (TR) -->
+              <option value="Adana">Adana</option>
+              <option value="Adiyaman">Adiyaman</option>
+              <option value="Afyonkarahisar">Afyonkarahisar</option>
+              <option value="Ağrı">Ağrı</option>
+              <option value="Aksaray">Aksaray</option>
+              <option value="Amasya">Amasya</option>
+              <option value="Ankara">Ankara</option>
+              <option value="Antalya">Antalya</option>
+              <option value="Ardahan">Ardahan</option>
+              <option value="Artvin">Artvin</option>
+              <option value="Aydin">Aydin</option>
+              <option value="Balıkesir">Balıkesir</option>
+              <option value="Bartın">Bartın</option>
+              <option value="Batman">Batman</option>
+              <option value="Bayburt">Bayburt</option>
+              <option value="Bilecik">Bilecik</option>
+              <option value="Bingöl">Bingöl</option>
+              <option value="Bitlis">Bitlis</option>
+              <option value="Bolu">Bolu</option>
+              <option value="Burdur">Burdur</option>
+              <option value="Bursa">Bursa</option>
+              <option value="Çanakkale">Çanakkale</option>
+              <option value="Çankırı">Çankırı</option>
+              <option value="Çorum">Çorum</option>
+              <option value="Denizli">Denizli</option>
+              <option value="Diyarbakir">Diyarbakir</option>
+              <option value="Düzce">Düzce</option>
+              <option value="Edirne">Edirne</option>
+              <option value="Elazığ">Elazığ</option>
+              <option value="Erzincan">Erzincan</option>
+              <option value="Erzurum">Erzurum</option>
+              <option value="Eskişehir">Eskişehir</option>
+              <option value="Gaziantep">Gaziantep</option>
+              <option value="Giresun">Giresun</option>
+              <option value="Gümüşhane">Gümüşhane</option>
+              <option value="Hakkâri">Hakkâri</option>
+              <option value="Hatay">Hatay</option>
+              <option value="Iğdır">Iğdır</option>
+              <option value="Isparta">Isparta</option>
+              <option value="Istanbul">Istanbul</option>
+              <option value="Izmir">Izmir</option>
+              <option value="Kahramanmaraş">Kahramanmaraş</option>
+              <option value="Karabük">Karabük</option>
+              <option value="Karaman">Karaman</option>
+              <option value="Kars">Kars</option>
+              <option value="Kastamonu">Kastamonu</option>
+              <option value="Kayseri">Kayseri</option>
+              <option value="Kilis">Kilis</option>
+              <option value="Kirikkale">Kirikkale</option>
+              <option value="Kirklareli">Kirklareli</option>
+              <option value="Kırşehir">Kırşehir</option>
+              <option value="Kocaeli">Kocaeli</option>
+              <option value="Konya">Konya</option>
+              <option value="Kütahya">Kütahya</option>
+              <option value="Malatya">Malatya</option>
+              <option value="Manisa">Manisa</option>
+              <option value="Mardin">Mardin</option>
+              <option value="Mersin">Mersin</option>
+              <option value="Muğla">Muğla</option>
+              <option value="Muş">Muş</option>
+              <option value="Nevşehir">Nevşehir</option>
+              <option value="Niğde">Niğde</option>
+              <option value="Ordu">Ordu</option>
+              <option value="Osmaniye">Osmaniye</option>
+              <option value="Rize">Rize</option>
+              <option value="Sakarya">Sakarya</option>
+              <option value="Samsun">Samsun</option>
+              <option value="Sanliurfa">Sanliurfa</option>
+              <option value="Siirt">Siirt</option>
+              <option value="Sinop">Sinop</option>
+              <option value="Şırnak">Şırnak</option>
+              <option value="Sivas">Sivas</option>
+              <option value="Tekirdağ">Tekirdağ</option>
+              <option value="Tokat">Tokat</option>
+              <option value="Trabzon">Trabzon</option>
+              <option value="Tunceli">Tunceli</option>
+              <option value="Uşak">Uşak</option>
+              <option value="Van">Van</option>
+              <option value="Yalova">Yalova</option>
+              <option value="Yozgat">Yozgat</option>
+              <option value="Zonguldak">Zonguldak</option>
+              <!-- United States (US) -->
               <option value='AL'>Alabama</option>
               <option value='AK'>Alaska</option>
               <option value='AZ'>Arizona</option>
