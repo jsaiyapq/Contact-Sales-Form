@@ -113,7 +113,7 @@ form#pq-contact .tooltip-arrow { /* id needed here for specificity */
 var thisScript = document.getElementById('cache-buster');
 var newScript = document.createElement('script');
 var triggerValue;
-switch ('testing') {  // change this value manually
+switch ('production') {  // change this value manually
   case 'testing':
     triggerValue = Math.random();  // force load on each page refresh
     newScript.src = 'https://stage.www.proquest.com/includes/pq-form-utils.js?cacheBuster='+triggerValue;
