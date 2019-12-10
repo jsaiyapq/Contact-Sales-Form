@@ -10,8 +10,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','GTM-PKTQGK');</script>
 <!-- End Google Tag Manager -->
 
-<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans" />
-<link rel="stylesheet" type="text/css" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" />
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,400,300,700,600" />
+<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" />
 <style type="text/css">
 /* Sub-Small devices (512px and up)         */
 /* needed for pages embedded in iframes     */
@@ -48,7 +48,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 /* end Sub-Small devices */
 </style>
 <link rel="stylesheet" type="text/css" href="https://www.proquest.com/includes/bootstrap.css" />
-<link rel="stylesheet" type="text/css" href="https://www.proquest.com/includes/IMC-style.css" />
+<!--<link rel="stylesheet" type="text/css" href="https://www.proquest.com/includes/IMC-style.css" />-->
 <link rel="stylesheet" type="text/css" href="https://www.proquest.com/includes/bootstrap-override-20140226.css" />
 <link rel="stylesheet" type="text/css" href="https://www.proquest.com/includes/bootstrap-select.css" />
 <link rel="stylesheet" type="text/css" href="https://www.proquest.com/includes/print-stylesheet.css" media="print" />
@@ -255,8 +255,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
   </div>
 
-  <div class="row sectionBlock">
-    <div class="col-ss-12 col-sm-10 col-md-8 col-lg-6 col-centered">
+  <div class="row sectionBlock"> 
+    <div class="col-ss-12 col-sm-4 col-md-6">
+      <h2 class="firstColheader">Prefer to call or email us?</h2>
+      <p>Phone: +1-877-779-6768</p>
+      <p>Email: <a href="mailto:sales@proquest.com?subject=Sales Contact Request" onclick="navigator.msLaunchUri('mailto:sales@proquest.com?subject=Sales%20Contact%20Request');location.reload();">sales@proquest.com</a></p>
+      <!-- `location.reload();` is a workaround for an IE 11 bug that makes the iframe content disappear when this link is clicked. -->
+      <!-- `msLaunchUri();` is just a small statement that gives IE a chance to call up the email window before the reload. -->
+      <!-- This onclick script seems to have no ill effects in Chrome or Firefox, so doesn`t cause a problem. -->
+    </div>
+
+    <div class="col-ss-12 col-sm-8 col-md-6">
       <p id="clear-identity-prompt">Not <span id="first_name_span">&nbsp;</span>? <a href="#" class="clear-identity-action" name="clear_form" xt="SPNOTRACK">Clear the form</a>.</p>
 
       <form name="pq-contact" id="pq-contact" class="pq-contact" method="POST" role="form" target="_parent" autocomplete="off">
@@ -1232,7 +1241,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
 
         <div class="row">
-          <div class="form-group col-md-3 col-lg-3">
+          <div class="form-group col-md-3">
             <input type="submit" name="submit" id="submit" class="btn btn-primary btn-lg" value="Submit" disabled />
           </div>
         </div>
