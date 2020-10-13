@@ -51,22 +51,22 @@ a.btn:link {  /* to override bootstrap-override a:link */
 <script id="cache-buster">
 /*
  * Cache Buster
- * Keeps Clickability from caching pq-form-utils.js (forces loading the latest code changes from the server)
+ * Keeps Clickability from caching pq-forms.js (forces loading the latest code changes from the server)
  */
 
 // Create a new <script> element in the DOM
 var thisScript = document.getElementById('cache-buster');
 var newScript = document.createElement('script');
 var triggerValue;
-switch ('production') {  // change this value manually
+switch ('testing') {  // change this value manually
   case 'testing':
     triggerValue = Math.random();  // force load on each page refresh
-    newScript.src = 'https://stage.www.proquest.com/includes/pq-form-utils.js?cacheBuster='+triggerValue;
+    newScript.src = 'https://stage.about.proquest.com/includes/pq-forms.js?cacheBuster='+triggerValue;
     break;
   case 'production':
     let today = new Date();
     triggerValue = today.toDateString();  // force load at least once a day
-    newScript.src = 'https://www.proquest.com/includes/pq-form-utils.js?cacheBuster='+triggerValue;
+    newScript.src = 'https://about.proquest.com/includes/pq-forms.js?cacheBuster='+triggerValue;
     break;
   default:
     console.error('Not using "testing" or "production" in Cache Buster switch statement');
@@ -82,8 +82,8 @@ function initFormUtilsOnLoad() {
     }, 200)
   } else {
     console.log('Script loaded.'); ////////////////
-    // execute pq-form-utils.js functions
-    initFormUtils('pq-contact', 'first_name', 'email', 'country', 'state_province', 'market', 'submarket', 'job_function', 'job_function_other');
+    // execute pq-forms.js functions
+    initFormUtils('pq-contact', 'first_name', 'email', 'country', 'state_province', 'job_function', 'job_function_other');
     let dateString = getTodaysDateString();
     $('#LastTouchLeadSourceDate').val(dateString);
     //$('#DoubleOptInDate').val(dateString);
@@ -174,31 +174,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <h2 class="firstColheader">Fale conosco</h2><!-- "Talk to Us" -->
     <p>Procurando mais informa&ccedil;&otilde;es? Pronto para contatar a ProQuest? Preencha o formul&aacute;rio e entraremos em contato. Temos o compromisso com respostas r&aacute;pidas a suas consultas e esperamos em breve nos conectar com voc&ecirc;.</p>
     <p>A matriz da ProQuest est&aacute; localizada em Ann Arbor, Michigan, EUA e possui escrit&oacute;rios ao redor do mundo. <a href="https://www.proquest.com/about/locations/" target="_parent" name="locations" xt="SPCLICKSTREAM">Veja endere&ccedil;os</a>.</p>
-    <div class="well">
-      <h2>Prefere ligar ou enviar um e-mail?</h2><!-- "Prefer to call or email us?" -->
-      <h3>Telefone: +1-877-779-6768</h3>
-      <h3>Email:</h3>
-      <!-- `location.reload();` is a workaround for an IE 11 bug that makes the iframe content disappear when this link is clicked. -->
-      <!-- `msLaunchUri();` is just a small statement that gives IE a chance to call up the email window before the reload. -->
-      <!-- This onclick script seems to have no ill effects in Chrome or Firefox, so doesn`t cause a problem. -->
-      <p>Para vendas na América do Norte:<br>
-        <a href="mailto:sales@proquest.com?subject=Sales%20Contact%20Request" onclick="navigator.msLaunchUri('mailto:sales@proquest.com?subject=Sales%20Contact%20Request');location.reload();">sales@proquest.com</a></p>
-      <p>Para vendas no Reino Unido e na Irlanda:<br>
-        <a href="mailto:ukisales@proquest.com" onclick="navigator.msLaunchUri('mailto:ukisales@proquest.com');location.reload();">ukisales@proquest.com</a></p>
-      <p>Para vendas na Europa Continental:<br>
-        <a href="mailto:eurosales@proquest.com" onclick="navigator.msLaunchUri('mailto:eurosales@proquest.com');location.reload();">eurosales@proquest.com</a></p>
-      <p>Para vendas no Oriente Médio, Índia e África:<br>
-        <a href="mailto:middleeastandafricasales@proquest.com" onclick="navigator.msLaunchUri('mailto:middleeastandafricasales@proquest.com');location.reload();">middleeastandafricasales@proquest.com</a></p>
-      <p>Para vendas no Brasil:<br>
-        <a href="mailto:portuguesesales@proquest.com" onclick="navigator.msLaunchUri('mailto:portuguesesales@proquest.com');location.reload();">portuguesesales@proquest.com</a></p>
-      <p>Para vendas na América Latina e Caribe:<br>
-        <a href="mailto:spanishsales@proquest.com" onclick="navigator.msLaunchUri('mailto:spanishsales@proquest.com');location.reload();">spanishsales@proquest.com</a><br>
-        <a href="mailto:caribbeansales@proquest.com" onclick="navigator.msLaunchUri('mailto:caribbeansales@proquest.com');location.reload();">caribbeansales@proquest.com</a></p>
-      <p>Para vendas na China, Coréia e Japão:<br>
-        <a href="mailto:asiasales@proquest.com" onclick="navigator.msLaunchUri('mailto:asiasales@proquest.com');location.reload();">asiasales@proquest.com</a></p>
-      <p>Para vendas no Sudeste Asiático e ANZ:<br>
-        <a href="mailto:southeastasiasales@proquest.com" onclick="navigator.msLaunchUri('mailto:southeastasiasales@proquest.com');location.reload();">southeastasiasales@proquest.com</a></p>
-    </div><!-- /.well -->
     <h3>Central de Atendimento</h3><!-- "Contact Support" -->
     <p>Para suporte relacionado a produtos e perguntas sobre treinamentos, por favor enviar-nos coment&aacute;rios atrav&eacute;s de nossa Central de Atendimento.</p>
     <p><a class="btn btn-primary btn-lg" href="https://support.proquest.com/" target="pq-support">CENTRAL DE ATENDIMENTO</a></p>
@@ -279,7 +254,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div>
 
       <div class="row">
-        <div class="form-group col-md-6 col-lg-6">
+        <div class="form-group col-xs-12">
           <label for="market">Tipo de organiza&ccedil;&atilde;o<span class="parsley-required"> *</span></label>
           <select name="Market" id="market" class="form-control" required>
             <option selected=""></option>
@@ -291,114 +266,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <option value="Non-profit Corporation">Non-Profit Corporation</option>
             <option value="Public Library">Public Library</option>
             <option value="Schools">Schools / K-12</option>
-          </select>
-        </div>
-        <div class="form-group col-md-6 col-lg-6">
-          <label for="submarket">Organiza&ccedil;&atilde;o Sub-tipo<span class="parsley-required"> *</span></label>
-          <select name="Sub_Market" id="submarket" class="form-control" required>
-            <option selected=""></option>
-            <option value="Academic">Academic</option>
-            <option value="Academic - Faculty">Academic - Faculty</option>
-            <option value="Academic - Student">Academic - Student</option>
-            <option value="Academic - Tribal">Academic - Tribal</option>
-            <option value="Administrative Services">Administrative Services</option>
-            <option value="Agriculture & Forestry">Agriculture &amp; Forestry</option>
-            <option value="Air Transportation">Air Transportation</option>
-            <option value="Arts, Entertainment & Recreation">Arts, Entertainment &amp; Recreation</option>
-            <option value="Associates College">Associates College</option>
-            <option value="Bacc Associates College">Bacc Associates College</option>
-            <option value="Bacc Colleges Liberal Arts">Bacc Colleges Liberal Arts</option>
-            <option value="Baccalaureate Colleges General">Baccalaureate Colleges General</option>
-            <option value="Biomedical">Biomedical</option>
-            <option value="Biotechnology">Biotechnology</option>
-            <option value="Bookstore">Bookstore</option>
-            <option value="Branch">Branch</option>
-            <option value="Central/Federal">Central/Federal</option>
-            <option value="Chemical Manufacturing">Chemical Manufacturing</option>
-            <option value="Combined School - Private">Combined School - Private</option>
-            <option value="Combined School - Public">Combined School - Public</option>
-            <option value="Construction">Construction</option>
-            <option value="Distributor">Distributor</option>
-            <option value="Doct Research Univ Extensive">Doct Research Univ Extensive</option>
-            <option value="Doct Research Univ Intensive">Doct Research Univ Intensive</option>
-            <option value="Educational Services">Educational Services</option>
-            <option value="Elementary School - Private">Elementary School - Private</option>
-            <option value="Elementary School - Public">Elementary School - Public</option>
-            <option value="Embassy/USIS/USIA">Embassy/USIS/USIA</option>
-            <option value="Environmental / Natural Science">Environmental / Natural Science</option>
-            <option value="Financial Services">Financial Services</option>
-            <option value="Food Processing">Food Processing</option>
-            <option value="Further Education">Further Education</option>
-            <option value="Genealogy">Genealogy</option>
-            <option value="Government">Government</option>
-            <option value="Health">Health</option>
-            <option value="High School - Private">High School - Private</option>
-            <option value="High School - Public">High School - Public</option>
-            <option value="Hospital or Medical Center">Hospital or Medical Center</option>
-            <option value="Hospital or Other Health">Hospital or Other Health</option>
-            <option value="Insurance">Insurance</option>
-            <option value="International Baccalaureate">International Baccalaureate</option>
-            <option value="Legal (In-house)">Legal (In-house)</option>
-            <option value="Legal Services/Law">Legal Services/Law</option>
-            <option value="Legal Services/Law Firms">Legal Services/Law Firms</option>
-            <option value="Local">Local</option>
-            <option value="Main">Main</option>
-            <option value="Management Services">Management Services</option>
-            <option value="Manufacturing">Manufacturing</option>
-            <option value="Masters Colleges and Univ I">Masters Colleges and Univ I</option>
-            <option value="Masters Colleges and Univ II">Masters Colleges and Univ II</option>
-            <option value="Medical Schools">Medical Schools</option>
-            <option value="Metal Mining">Metal Mining</option>
-            <option value="Middle School - Private">Middle School - Private</option>
-            <option value="Middle School - Public">Middle School - Public</option>
-            <option value="Military">Military</option>
-            <option value="Mining">Mining</option>
-            <option value="Mixed Market">Mixed Market</option>
-            <option value="Motor Vehicle Manufacturing">Motor Vehicle Manufacturing</option>
-            <option value="Museums, Histl Sites & Similar Inst">Museums, Histl Sites &amp; Similar Inst</option>
-            <option value="Museums, Historical Sites & Similar Inst">Museums, Historical Sites &amp; Similar Inst</option>
-            <option value="National">National</option>
-            <option value="National Library">National Library</option>
-            <option value="Non-Academic">Non-Academic</option>
-            <option value="Non-PHD Granting">Non-PHD Granting</option>
-            <option value="Other">Other</option>
-            <option value="Other Health Profession School">Other Health Profession School</option>
-            <option value="Other Information Services">Other Information Services</option>
-            <option value="Other Specialized Institutions">Other Specialized Institutions</option>
-            <option value="Personal & Household Products">Personal &amp; Household Products</option>
-            <option value="Petroleum Industry">Petroleum Industry</option>
-            <option value="Pharmaceutical">Pharmaceutical</option>
-            <option value="PHD Granting">PHD Granting</option>
-            <option value="Primary">Primary</option>
-            <option value="Professional Services">Professional Services</option>
-            <option value="Public Library">Public Library</option>
-            <option value="Publishing">Publishing</option>
-            <option value="Real Estate">Real Estate</option>
-            <option value="Religious, Grantmaking, Civic & Similar Orgs">Religious, Grantmaking, Civic &amp; Similar Orgs</option>
-            <option value="Research Institution / Think Tank">Research Institution / Think Tank</option>
-            <option value="Research Services">Research Services</option>
-            <option value="Retail Trade - Not Bookstore">Retail Trade - Not Bookstore</option>
-            <option value="School District">School District</option>
-            <option value="School of Art & Music & Design">School of Art &amp; Music &amp; Design</option>
-            <option value="Schools">Schools</option>
-            <option value="Schools of Business & Mgmt">Schools of Business &amp; Mgmt</option>
-            <option value="Schools of Engineering & Tech">Schools of Engineering &amp; Tech</option>
-            <option value="Schools of Law">Schools of Law</option>
-            <option value="Secondary">Secondary</option>
-            <option value="Social Assistance">Social Assistance</option>
-            <option value="Social Health Service">Social Health Service</option>
-            <option value="Social Service">Social Service</option>
-            <option value="Space Research & Technology">Space Research &amp; Technology</option>
-            <option value="State">State</option>
-            <option value="State/Provincial">State/Provincial</option>
-            <option value="System">System</option>
-            <option value="Teachers College">Teachers College</option>
-            <option value="Theol & Other Faith Seminaries">Theol &amp; Other Faith Seminaries</option>
-            <option value="Trade Union / Professional Organization">Trade Union / Professional Organization</option>
-            <option value="Transportation & Warehousing">Transportation &amp; Warehousing</option>
-            <option value="Unclassified">Unclassified</option>
-            <option value="Utilities">Utilities</option>
-            <option value="Wholesale Trade">Wholesale Trade</option>
           </select>
         </div>
       </div>

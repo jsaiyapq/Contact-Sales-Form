@@ -1,145 +1,133 @@
-/* ########################################  PQ Form Utils  ########################################
-@title   ProQuest Form Utilities
-@author  Jim Saiya
-@date    2019-05-28
+/**
+ * @title   ProQuest Form Utilities -- "No Submarket" version (in development)
+ * @author  Jim Saiya
+ * @date    2020-08-03
+ *
+ * Allows a user to clear the form if a previous user set a cookie on the machine.
+ * Otherwise prevents a user from updating an email address associated with a record in the DB.
+ * Based on pq-form-utils.js.
+ *
+ * Requires the following jQuery plug-ins to be loaded on the page:
+ * - <script src="//www.proquest.com/includes/parsley.js"></script>
+ * - <script src="//www.proquest.com/includes/jquery.form.min.js"></script>
+ *
+ * EXAMPLE CALL - change these values to match the field ids in the calling form:
+ *   initFormUtils('pq-contact', 'firstname', 'email', 'country', 'state_province', 'job_function', 'job_function_other');
+*/
 
-   A $(document).ready() JQuery function must be added to the JavaScript on the form .html page.
 
-   $(document).ready(function(e) {
-     initFormUtils([form id],[default focus element id],[email element id],[country element id],[state/province element id],
-      [market element id],[sub-market element id],[job function element id],[other job function element id]);
-   });
-
-   EXAMPLE - change these values to match your field ids:
-     initFormUtils('pq-contact', 'firstname', 'email', 'country', 'state_province', 'market', 'submarket', 'job_function', 'job_function_other');
-
-   ################################################################################################# */
+var $theForm, $defaultField, $emailField, $countryField, $stateField, $jobFuncField, $jobFuncOtherField;
+// Parsley setup is handled in the Contact Sales HTML files
 
 
-// *** LEGACY *** Function to initialize utilities
-//  This will to be called by deployed Landing Pages that were based on the Base LP Templates
-//  New forms will call initFormUtils() (below) instead
-function startFormUtils(sfuForm, sfuCountry, sfuStateprov, sfuMarket, sfuSubmarket, sfuEmail, sfuDefaultField) {
+/**
+ * Entry point function
+ *
+ * Call this from within a "document ready" JQuery function on the form page
+ * - formID:         ID string of the form element
+ * - defaultFieldID: ID string of field to focus on when email is disabled
+ * - emailID:        ID string of the email field input element
+ * - countryID:      ID string of the Country drop-down
+ * - stateID         ID string of the State/Province drop-down
+ * - jobFuncID:      ID string of Job Function drop-down
+ * - jobFuncOtherID: ID string of Job Function Other field
+ */
+function initFormUtils(formID, defaultFieldID, emailID, countryID, stateID, jobFuncID, jobFuncOtherID) {
 
-	checkMarketSubmarket('init', sfuMarket, sfuSubmarket);
-	$('#'+sfuMarket).change(function(e) {
-		checkMarketSubmarket('change', sfuMarket, sfuSubmarket);
+	$theForm           = $('#'+formID);
+	$defaultField      = $('#'+defaultFieldID);
+	$emailField        = $('#'+emailID);
+	$countryField      = $('#'+countryID);
+	$stateField        = $('#'+stateID);
+	$jobFuncField      = $('#'+jobFuncID);
+	$jobFuncOtherField = $('#'+jobFuncOtherID);
+
+	// link the country and state/province fields
+	checkCountryState('init');
+	$countryField.change(function(e) {
+		checkCountryState('change');
 	});
 
-	checkCountryState('init', sfuCountry, sfuStateprov);
-	$('#'+sfuCountry).change(function(e) {
-		checkCountryState('change', sfuCountry, sfuStateprov);
+	// support the "Other" job function field
+	checkJobFunction('init');
+	$jobFuncField.change(function(e) {
+		checkJobFunction('change');
 	});
 
-	if ( $('[name="RECIPIENT_ID_*"]').length ) {  // there is a cookie for this page
-
-		if ( !$('#'+sfuSubmarket).val() ) {
-			console.error('Browser form error. '+sfuSubmarket+' field is empty.');
-		}
-
-		// Bind clearIdentity() function to all links that clear the form
-		$('.clear-identity-action').click(function(e) {
-			e.preventDefault();						// don`t reload the page
-			checkCountryState('init', sfuCountry, sfuStateprov);		// reset the State/Province field if needed
-		});
-
-	}
+	// initialize the identity clearing
+	// only perform the init if the hidden field with a recipient`s ID is present
+	if ( $('[name="RECIPIENT_ID_*"]').length )
+		initFormIdentityLink();
 
 }
 
 
-// Function to initialize utilities
-//  Call this from within a $(document).ready() JQuery function on the form page
-function initFormUtils(sfuForm, sfuDefaultField, sfuEmail, sfuCountry, sfuStateprov, sfuMarket, sfuSubmarket, sfuJobFunc, sfuOtherJobFunc) {
-
-	checkJobFunction('init', sfuJobFunc, sfuOtherJobFunc);
-	$('#'+sfuJobFunc).change(function(e) {
-		checkJobFunction('change', sfuJobFunc, sfuOtherJobFunc);
-	});
-
-	checkMarketSubmarket('init', sfuMarket, sfuSubmarket);
-	$('#'+sfuMarket).change(function(e) {
-		checkMarketSubmarket('change', sfuMarket, sfuSubmarket);
-	});
-
-	checkCountryState('init', sfuCountry, sfuStateprov);
-	$('#'+sfuCountry).change(function(e) {
-		checkCountryState('change', sfuCountry, sfuStateprov);
-	});
-
-	if ( $('[name="RECIPIENT_ID_*"]').length ) {  // there is a cookie for this page
-
-		// IE sometimes does not pull the data from some of the fields into JavaScript
-		//  this happens about half the time
-		//  so keep reloading the page until we get good data
-		if ( !$('#'+sfuSubmarket).val() ) {
-			console.error('Browser form error. '+sfuSubmarket+' field is empty.');
-// Fix disabled due to conflicts with other form pages (creating records with missing fields)
-//			console.error('Browser form error. Reloading page.');
-//			location.reload(true);
-		}
-
-		initFormIdentityLink(sfuForm, sfuDefaultField, sfuEmail, sfuCountry, sfuStateprov, sfuJobFunc, sfuOtherJobFunc);
-
-	}
-
-}
-
-
-// Function to initialize the identity clearing framework if applicable
-function initFormIdentityLink(sfuForm, sfuDefaultField, sfuEmail, sfuCountry, sfuStateprov, sfuJobFunc, sfuOtherJobFunc) {
+/**
+ * Initialize the identity clearing framework if this record exists in the DB
+ */
+function initFormIdentityLink() {
 
 	// disable email field
-	$('#'+sfuEmail).prop('disabled', 'disabled');
-
-	// do not require validation on disabled fields
-	$('#'+sfuEmail).removeProp('required');
+	$emailField.prop('disabled', 'disabled');
+	$emailField.removeProp('required');
 
 	// enable email field before submitting form, otherwise value will not be sent
-	$('#'+sfuForm).submit(function() {
-		$('#'+sfuEmail).prop('disabled', false);
+	$theForm.submit(function() {
+		$emailField.prop('disabled', false);
 	});
 
-	// Show the "Clear the form" prompt
+	// show the email warning paragraph
+//	$('#email-warning').show();
+
+	// show the "Clear the form" prompt
 	$('#clear-identity-prompt').show();
 	// and because Firefox sometimes doesn`t make the prompt appear...
-	$('#clear-identity-prompt').css('display', 'inline-block');
+	$('#clear-identity-prompt').css('display', 'block');
 
-	// Bind clearUserIdentity() function to all links that clear the form
-	$('.clear-identity-action').click(function(e) {
-		e.preventDefault();						// don`t reload the page
-		clearUserIdentity(sfuForm, sfuEmail);				// clear the form
-		checkJobFunction('init', sfuJobFunc, sfuOtherJobFunc);		// reset the Other Job Function field
-		checkCountryState('init', sfuCountry, sfuStateprov);		// reset the State/Province field if needed
-		$('#'+sfuDefaultField).focus();					// focus on the default field for the form
+	// Bind clearIdentity() function to all links that clear the form
+	$('.clear-identity-action').click(function() {
+		clearIdentity();
+		checkJobFunction('init');
+		checkCountryState('init');
+		$defaultField.focus();
 	});
 
 }
 
 
-// Function to clear the contact form, including cookie and hidden recipient id field
-function clearUserIdentity(sfuForm, sfuEmail) {
+/**
+ * Clear the contact form, including cookie and hidden recipient id field
+ */
+function clearIdentity() {
 
-	// Clear the cookie
-//	var remove_sp_identity = $.removeCookie('SP_IDENTITY');
-//	var remove_sp_identity = $.removeCookie('SP_IDENTITY', { path: '/' });
-	var remove_sp_identity = true;
-console.log('Clearing identity...'); ////////////////////////////////
+console.log('"clearIdentity()" called.'); ////////////////////////////////
 
-	// If cookie removal was successful, finish the job
-	if ( remove_sp_identity ) {
-		$('[name="RECIPIENT_ID_*"]').remove();				// remove the recipient id field
-		$('#clear-identity-prompt').hide();				// remove the "Clear the form" prompt from above the form
-		$('#'+sfuForm ).clearForm();					// reset the form (from jquery.form.js)
-		$('#'+sfuEmail).prop('disabled', false);			// enable email field
-		$('#'+sfuEmail).prop('required', 'required');			// require an email address
-		$('#submit').prop('disabled', true);				// disable the Submit button since the Double OptIn checkbox is cleared
-	}
+	// remove the recipient id field
+	//  only to make sure it does not get sent with the new record
+	$('[name="RECIPIENT_ID_*"]').remove();
+
+	// hide the email warning paragraph
+//	$('#email-warning').hide();
+
+	// remove the "Clear the form" prompt from above the form
+	$('#clear-identity-prompt').hide();
+
+	// clear the form fields
+	$theForm.clearForm();  // (from jquery.form.js)
+
+	// enable email field
+	$emailField.prop('disabled', false);
+	$emailField.prop('required', 'required');
+
+	// disable the Submit button since the Double OptIn checkbox is cleared
+	$('#submit').prop('disabled', true);  // only English form has an id attribute on the Submit button
 
 }
 
 
-// Function to get today`s date for filling out date fields
+/**
+ * Get today`s date for filling out date fields
+ */
 function getTodaysDateString() {
   var today = new Date();
   var dd = today.getDate();
@@ -154,99 +142,75 @@ function getTodaysDateString() {
 }
 
 
-// Function to check if the value of the "Job Function" field is "Other" and, if so, activate the "Other Job Function" field
-function checkJobFunction(mode, sfuJobFunc, sfuOtherJobFunc) {
+/**
+ * Activate the "Other Job Function" text field if
+ *  the value of the "Job Function" field is "Other"
+ */
+function checkJobFunction(mode) {
 
 	// Remember selected job function
-	var currentJobFunction = $('#'+sfuJobFunc).val();
+	var currentJobFunction = $jobFuncField.val();
 console.log('Selected Job Function: ', currentJobFunction); ////////////////////////////////
 
 	if ( currentJobFunction == 'Other' ) {
 
-		$('#'+sfuOtherJobFunc).prop('disabled', false);		// enable other function field
-		$('#'+sfuOtherJobFunc).prop('required', 'required');	// require other function value
-		// clear any existing "required field" asterisk and add one
-		$('#'+sfuOtherJobFunc).parent().find('label > span.parsley-required').remove();
-		$('#'+sfuOtherJobFunc).parent().children('label').append('<span class="parsley-required"> *</span>');
+		// enable other function field
+		$jobFuncOtherField.prop('disabled', false);
+		$jobFuncOtherField.prop('required', 'required');
 
-		// If freshly selected, focus on "Other" field
+		// clear any existing "required field" asterisk(s) and add one
+		$jobFuncOtherField.parent().find('label > span.parsley-required').remove();
+		$jobFuncOtherField.parent().children('label').append('<span class="parsley-required"> *</span>');
+
+		// if freshly selected, focus on "Other" field
 		if ( mode == 'change' ) {
-			$('#'+sfuOtherJobFunc).focus();
+			$jobFuncOtherField.focus();
 		}
 
-	}
-	else {  // The job function has been picked from the list
+	} else {  // The job function has been picked from the list
 
-		// Clear "Other" field
-		$('#'+sfuOtherJobFunc).val('');
+		// disable "Other" field
+		$jobFuncOtherField.val('');
+		$jobFuncOtherField.prop('disabled', 'disabled');
+		$jobFuncOtherField.removeProp('required');
 
-		$('#'+sfuOtherJobFunc).prop('disabled', 'disabled');				// disable other function field
-		$('#'+sfuOtherJobFunc).removeProp('required');					// do not require validation
-		$('#'+sfuOtherJobFunc).parent().find('label > span.parsley-required').remove();	// remove asterisk
-		$('#'+sfuOtherJobFunc).parsley().validate({force: true});			// remove any Parsley border
+		// remove asterisk
+		$jobFuncOtherField.parent().find('label > span.parsley-required').remove();
+
+		// remove any border drawn by Parsley
+		$jobFuncOtherField.parsley().validate({ force: true });
 
 	}
 
 }
 
 
-// Function to check the value of the "Market" field and set the "Submarket" field accordingly
-function checkMarketSubmarket(mode, sfuMarket, sfuSubmarket) {
-
-	// Remember selected market
-	var currentMarket = $('#'+sfuMarket).val();
-console.log('Selected Market:     ', currentMarket); ////////////////////////////////
-
-	// Remember selected submarket
-	var currentSubmarket = $('#'+sfuSubmarket+' option:selected').val();
-console.log('Selected Submarket:  ', currentSubmarket); ////////////////////////////////
-
-	// Clear existing options from submarket dropdown
-	$('#'+sfuSubmarket).empty();
-
-	// Get the market and its submarkets from data structure
-	var selectedMarket = marketSubmarketList.filter(function(marketSubmarket) { return marketSubmarket.market == currentMarket });
-
-	if ( selectedMarket.length ) {  // the market was found
-
-		// Build market`s submarket dropdown list
-		var opt = new Option('', '');
-		$('#'+sfuSubmarket).append(opt);
-		$(selectedMarket[0].submarkets).each(function(index, submarket) {
-			opt = new Option(submarket, submarket);
-			$('#'+sfuSubmarket).append(opt);
-		});
-
-		// If this is initiating the form, select the existing submarket loaded from contact
-		if ( mode == 'init' ) {
-			$('#'+sfuSubmarket+' option').prop('selected', false);
-			$('#'+sfuSubmarket+' option[value="'+currentSubmarket+'"]').prop('selected', 'selected');
-			$('#'+sfuSubmarket).val(currentSubmarket);
-		}
-
-	}
-
-}
-
-
-// Function to check the value of the "Country" field and set the "State/Province" field accordingly
-function checkCountryState(mode, sfuCountry, sfuStateprov) {
+/**
+ * Build or clear the "State/Province" drop-down field
+ *  based on the value of the "Country" field
+ */
+function checkCountryState(mode) {
 
 	// Remember selected country
-	var currentCountry = $('#'+sfuCountry).val();
+	var currentCountry = $countryField.val();
 console.log('Selected Country:    ', currentCountry); ////////////////////////////////
 
 	// Remember selected state/province
-	var currentState = $('#'+sfuStateprov+' option:selected').val();
+	var currentState = $stateField.find('option:selected').val();
 console.log('Selected State:      ', currentState); ////////////////////////////////
 
-	// Clear existing options from state/province dropdown
-	$('#'+sfuStateprov).empty();
+	// clear existing options from state/province drop-down
+	$stateField.empty();
 
-	$('#'+sfuStateprov).prop('disabled', 'disabled');				// disable state/province field
-	$('#'+sfuStateprov).removeProp('required');					// do not require validation
-	$('#'+sfuStateprov).parent().find('label > span.parsley-required').remove();	// remove asterisk
-	$('#'+sfuStateprov).parsley().validate({force: true});				// remove any Parsley border
+	// disable state/province field
+	$stateField.prop('disabled', 'disabled');
+	$stateField.removeProp('required');
+
+	// remove asterisk
+	$stateField.parent().find('label > span.parsley-required').remove();
+
+	// remove any border drawn by Parsley
+	$stateField.parsley().validate({ force: true });
 
 	// Get the country and its states (or provinces) from data structure
 	var selectedCountry = countryStateList.filter(function(countryState) { return countryState.country == currentCountry });
@@ -254,26 +218,28 @@ console.log('Selected State:      ', currentState); ////////////////////////////
 	if ( selectedCountry.length ) {  // the country was found
 		if ( selectedCountry[0].states.length ) {  // this country has states or provinces
 
-			// Build country`s state/province dropdown list
+			// build country`s state/province drop-down list
 			var opt = new Option('', '');
-			$('#'+sfuStateprov).append(opt);
+			$stateField.append(opt);
 			$(selectedCountry[0].states).each(function(index, state) {
 				opt = new Option(state.name, state.code);
-				$('#'+sfuStateprov).append(opt);
+				$stateField.append(opt);
 			});
 
-			// If this is initiating the form, select the existing state or province loaded from contact
+			// if the form is being initialized, select the existing state or province loaded from contact
 			if ( mode == 'init' ) {
-				$('#'+sfuStateprov+' option').prop('selected', false);
-				$('#'+sfuStateprov+' option[value="'+currentState+'"]').prop('selected', 'selected');
-				$('#'+sfuStateprov).val(currentState);
+				$stateField.find('option').prop('selected', false);
+				$stateField.find('option[value="'+currentState+'"]').prop('selected', 'selected');
+				$stateField.val(currentState);
 			}
 
-			$('#'+sfuStateprov).prop('disabled', false);			// enable state/province field
-			$('#'+sfuStateprov).prop('required', 'required');		// require state/province value
+			// enable state/province field
+			$stateField.prop('disabled', false);
+			$stateField.prop('required', 'required');
+
 			// clear any existing "required field" asterisk and add one
-			$('#'+sfuStateprov).parent().find('label > span.parsley-required').remove();
-			$('#'+sfuStateprov).parent().children('label').append('<span class="parsley-required"> *</span>');
+			$stateField.parent().find('label > span.parsley-required').remove();
+			$stateField.parent().children('label').append('<span class="parsley-required"> *</span>');
 
 		}
 	}
@@ -281,145 +247,7 @@ console.log('Selected State:      ', currentState); ////////////////////////////
 }
 
 
-// ###############################################################################################
 // #######################################  DATA SECTION  ########################################
-
-// ============ Markets and Submarkets ============
-var marketSubmarketList = [
-{market: 'Academic', submarkets: [
-	'Associates College',
-	'Baccalaureate Colleges General',
-	'Bacc Associates College',
-	'Bacc Colleges Liberal Arts',
-	'Doct Research Univ Extensive',
-	'Doct Research Univ Intensive',
-	'Further Education',
-	'Hospital or Medical Center',
-	'Legal (In-house)',
-	'Masters Colleges and Univ I',
-	'Masters Colleges and Univ II',
-	'Medical Schools',
-	'Non-PHD Granting',
-	'Other Health Profession School',
-	'Other Specialized Institutions',
-	'PHD Granting',
-	'School of Art & Music & Design',
-	'Schools of Business & Mgmt',
-	'Schools of Engineering & Tech',
-	'Schools of Law',
-	'Teachers College',
-	'Theol & Other Faith Seminaries',
-	'Unclassified'
-]},
-{market: 'Consortia', submarkets: [
-	'Academic',
-	'Government',
-	'Mixed Market',
-	'Public Library',
-	'Schools'
-]},
-{market: 'Corporate', submarkets: [
-	'Administrative Services',
-	'Agriculture & Forestry',
-	'Air Transportation',
-	'Arts, Entertainment & Recreation',
-	'Biomedical',
-	'Biotechnology',
-	'Bookstore',
-	'Chemical Manufacturing',
-	'Construction',
-	'Distributor',
-	'Educational Services',
-	'Financial Services',
-	'Food Processing',
-	'Genealogy',
-	'Health',
-	'Historical Societies',
-	'Hospital or Other Health',
-	'Insurance',
-	'Legal (In-house)',
-	'Legal Services/Law Firms',
-	'Management Services',
-	'Manufacturing',
-	'Metal Mining',
-	'Mining',
-	'Motor Vehicle Manufacturing',
-	'Other Information Services',
-	'Personal & Household Products',
-	'Petroleum Industry',
-	'Pharmaceutical',
-	'Professional Services',
-	'Publishing',
-	'Real Estate',
-	'Religious, Grantmaking, Civic & Similar Orgs',
-	'Research Services',
-	'Retail Trade - Not Bookstore',
-	'Social Assistance',
-	'Space Research & Technology',
-	'Transportation & Warehousing',
-	'Unclassified',
-	'Utilities',
-	'Wholesale Trade'
-]},
-{market: 'Government', submarkets: [
-	'Academic',
-	'Academic - Tribal',
-	'Central/Federal',
-	'Embassy/USIS/USIA',
-	'Hospital or Medical Center',
-	'Legal Services/Law',
-	'Local',
-	'Military',
-	'Museums, Histl Sites & Similar Inst',
-	'National Library',
-	'Schools',
-	'Social Health Service',
-	'State/Provincial',
-	'Unclassified'
-]},
-{market: 'Individual', submarkets: [
-	'Academic - Faculty',
-	'Academic - Student',
-	'Non-Academic'
-]},
-{market: 'Non-profit Corporation', submarkets: [
-	'Arts, Entertainment & Recreation',
-	'Environmental / Natural Science',
-	'Financial Services',
-	'Hospital or Other Health',
-	'Legal Services/Law',
-	'Museums, Histl Sites & Similar Inst',
-	'Publishing',
-	'Religious, Grantmaking, Civic & Similar Orgs',
-	'Research Institution / Think Tank',
-	'Social Service',
-	'Trade Union / Professional Organization',
-	'Unclassified'
-]},
-{market: 'Public Library', submarkets: [
-	'Branch',
-	'Main',
-	'National',
-	'Other',
-	'State',
-	'System'
-]},
-{market: 'Schools', submarkets: [
-	'Combined School - Private',
-	'Combined School - Public',
-	'Elementary School - Private',
-	'Elementary School - Public',
-	'High School - Private',
-	'High School - Public',
-	'International Baccalaureate',
-	'Middle School - Private',
-	'Middle School - Public',
-	'Primary',
-	'School District',
-	'Secondary',
-	'Unclassified'
-]}
-];
 
 // ============ Countries and States ============
 var countryStateList = [
