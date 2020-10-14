@@ -2,20 +2,65 @@
 <head>
 <title>Contact Us - ProQuest</title>
 
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+<script>
+// Begin `Zero Tracker` code
+function gtmLoadingLogic(c_notice_behavior, c_notice_gdpr_prefs) {
+	var loadGTM = false;
+	if (c_notice_behavior.indexOf('implied') > -1) {
+		loadGTM = (c_notice_gdpr_prefs != '0:') ? true : false
+	} else if (c_notice_behavior.indexOf('expressed') > -1) {
+		loadGTM = (c_notice_gdpr_prefs.indexOf('1') > -1) ? true : false
+	}
+	if (loadGTM) {
+		trackingLoad()
+	}
+}
+
+function trackingLoad() {
+
+// This line needs to be above GTM -- see https://developers.google.com/tag-manager/devguide
+dataLayer = [];
+
+/* Google Tag Manager */
+(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 '//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-PKTQGK');</script>
-<!-- End Google Tag Manager -->
+})(window,document,'script','dataLayer','GTM-PKTQGK');
+/* End Google Tag Manager */
+
+/* End trackingLoad() */
+}
+
+function getCookie(t) {
+	for (var n = t + '=', e = document.cookie.split(';'), r = 0; r < e.length; r++) {
+		for (var i = e[r];
+			' ' == i.charAt(0);) i = i.substring(1, i.length);
+		if (0 == i.indexOf(n)) return i.substring(n.length, i.length)
+	}
+	return ''
+}
+
+var trit = setInterval(function() {
+	var c_notice_behavior = getCookie('notice_behavior');
+	var c_notice_gdpr_prefs = getCookie('notice_gdpr_prefs');
+	if (c_notice_behavior.indexOf('implied') > -1) {
+		window.clearInterval(trit);
+		gtmLoadingLogic(c_notice_behavior, c_notice_gdpr_prefs)
+	} else if (c_notice_behavior.indexOf('expressed') > -1 && c_notice_gdpr_prefs != '') {
+		window.clearInterval(trit);
+		gtmLoadingLogic(c_notice_behavior, c_notice_gdpr_prefs)
+	}
+}, 1000);
+// End `Zero Tracker` code
+</script>
 
 <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,400,300,700,600" />
 <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" />
-<link rel="stylesheet" type="text/css" href="https://www.proquest.com/includes/bootstrap.css" />
-<link rel="stylesheet" type="text/css" href="https://www.proquest.com/includes/bootstrap-override-20140226.css" />
-<link rel="stylesheet" type="text/css" href="https://www.proquest.com/includes/bootstrap-select.css" />
-<link rel="stylesheet" type="text/css" href="https://www.proquest.com/includes/print-stylesheet.css" media="print" />
+<link rel="stylesheet" type="text/css" href="https://about.proquest.com/includes/bootstrap.css" />
+<link rel="stylesheet" type="text/css" href="https://about.proquest.com/includes/bootstrap-override-20140226.css" />
+<link rel="stylesheet" type="text/css" href="https://about.proquest.com/includes/bootstrap-select.css" />
+<link rel="stylesheet" type="text/css" href="https://about.proquest.com/includes/print-stylesheet.css" media="print" />
 <style type="text/css">
 .parsley-error {
   border: 2px solid #a51f1e;
@@ -44,7 +89,7 @@ a.btn:link {  /* to override bootstrap-override a:link */
 </style>
 
 <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-<script src="https://www.proquest.com/includes/bootstrap.min.js"></script>
+<script src="https://about.proquest.com/includes/bootstrap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/parsley.js/2.7.2/parsley.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.2.1/jquery.form.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
@@ -58,7 +103,7 @@ a.btn:link {  /* to override bootstrap-override a:link */
 var thisScript = document.getElementById('cache-buster');
 var newScript = document.createElement('script');
 var triggerValue;
-switch ('testing') {  // change this value manually
+switch ('testing') {  // <<== EDITOR: change this to 'production' when you're through with testing and ready to publish
   case 'testing':
     triggerValue = Math.random();  // force load on each page refresh
     newScript.src = 'https://stage.about.proquest.com/includes/pq-forms.js?cacheBuster='+triggerValue;
@@ -94,7 +139,7 @@ function initFormUtilsOnLoad() {
 /*
  * Document Ready function
  */
-$( document ).ready(function() {
+$(function() {
 
   console.log('\nBegin Doc Ready.'); ////////////////
 
@@ -151,7 +196,7 @@ $( document ).ready(function() {
   initFormUtilsOnLoad();
 
   // force these values for both new and existing users who submit this form
-  // (we need to set them here instead of in HTML because Watson will overwrite the defaults for existing users)
+  // (we need to set them here instead of in HTML because Acoustic will overwrite the defaults for existing users)
   $('#LeadStatus').val('Sales Ready');
   $('#SalesReadyType').val('Direct Inquiries');
   $('#LastTouchLeadSource').val('Web-Direct Inquiry');
@@ -164,16 +209,11 @@ $( document ).ready(function() {
 
 <body style="overflow: hidden;">  <!-- `overflow: hidden` makes sure there are no scrollbars on the iframe -->
 
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PKTQGK"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
-
 <div class="row">
   <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
     <h2 class="firstColheader">お問い合わせ</h2><!-- "Talk to Us" -->
     <p>ProQuestの製品・サービスについてお気軽にお問い合わせください。ご契約に関するご相談も承ります。 必要事項をご記入のうえ、送信ボタンを押してご連絡ください。</p>
-    <p>ProQuestは米国のミシガン州、アナーバーに本社を置くグローバル企業です。<a href="https://www.proquest.com/about/locations/" target="_parent" name="locations" xt="SPCLICKSTREAM">各国オフィスのロケーションはこちらをご覧ください</a>.</p>
+    <p>ProQuestは米国のミシガン州、アナーバーに本社を置くグローバル企業です。<a href="https://about.proquest.com/about/locations/" target="_parent" name="locations" xt="SPCLICKSTREAM">各国オフィスのロケーションはこちらをご覧ください</a>.</p>
     <h3>サポートセンターに問い合わせる</h3><!-- "Contact Support" -->
     <p>ProQuest製品・サービスのカスタマーサポートに御用のお客様は弊社のサポートセンターまでご連絡ください</p>
     <p><a class="btn btn-primary btn-lg" href="https://support.proquest.com/" target="pq-support">サポートセンターに問い合わせる</a></p>
@@ -182,7 +222,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
     <p id="clear-identity-prompt"><span id="first_name_span">&nbsp;</span>ではありませんか？<a href="#" class="clear-identity-action" name="clear_form" xt="SPNOTRACK">フォームをクリア</a>にしてください。</p>
 
-    <form name="pq-contact" id="pq-contact" class="pq-contact" method="post" role="form" autocomplete="off">
+    <form name="pq-contact" id="pq-contact" class="pq-contact" method="post" autocomplete="off">
     <!-- Autocomplete set to "off" for compatibility workaround for Firefox. -->
 
       <div class="row">
@@ -1036,7 +1076,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
       <div class="row">
         <div class="form-group col-md-3 col-lg-3">
-          <input type="submit" name="submit" class="btn btn-primary btn-lg" value="送信する" />
+          <input type="submit" name="submit" class="btn btn-primary btn-lg" value="送信する" /><!-- opt-in not required, so id must not be "submit" -->
         </div>
       </div>
 
@@ -1045,6 +1085,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <input type="hidden" name="Sales Ready Type" id="SalesReadyType" value="" />
       <input type="hidden" name="Last Touch Lead Source" id="LastTouchLeadSource" value="" />
       <input type="hidden" name="Last Touch Lead Source Date" id="LastTouchLeadSourceDate" value="mm/dd/yyyy" />
+      <!--<input type="hidden" name="Double OptIn Date" id="DoubleOptInDate" value="mm/dd/yyyy" />-->
 
     </form>
   </div>
